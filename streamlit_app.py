@@ -3,7 +3,10 @@ import google.generativeai as genai
 import time
 import re
 import os
+from PIL import Image
+import matplotlib.pyplot as plt
 
+# Ensure GEMINI_API_KEY is set
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
 if not GEMINI_API_KEY:
     raise ValueError("Missing GEMINI_API_KEY environment variable")
@@ -16,64 +19,61 @@ st.set_page_config(
     layout="wide"
 )
 
-st.markdown("""
-    <style>
-        .back-button {
-            width: 300px;
-            margin-top: 20px;
-            padding: 10px 20px;
-            font-size: 18px;
-            background-color: #0b1936;
-            color: #5799f7;
-            border: 2px solid #4a83d4;
-            border-radius: 10px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            font-family: 'Orbitron', sans-serif;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            box-shadow: 0 0 15px rgba(74, 131, 212, 0.3);
-            position: relative;
-            overflow: hidden;
-            display: inline-block;
-        }
-
-        .back-button:before {
-            content: 'BACK TO INTERLINK';
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background-color: #0b1936;
-            transition: transform 0.3s ease;
-            font-size: 18px;
-            color: #5799f7;
-            text-align: center;
-        }
-
-        .back-button:hover {
-            background-color: #1c275c;
-            color: #73abfa;
-            transform: translateY(-2px);
-            box-shadow: 0 6px 8px rgba(74, 131, 212, 0.2);
-        }
-
-        .back-button:hover:before {
-            transform: translateY(-100%);
-            color: #73abfa;
-        }
-    </style>
+# Custom styles for the back button
+st.markdown("""<style>
+    .back-button {
+        width: 300px;
+        margin-top: 20px;
+        padding: 10px 20px;
+        font-size: 18px;
+        background-color: #0b1936;
+        color: #5799f7;
+        border: 2px solid #4a83d4;
+        border-radius: 10px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        font-family: 'Orbitron', sans-serif;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+        box-shadow: 0 0 15px rgba(74, 131, 212, 0.3);
+        position: relative;
+        overflow: hidden;
+        display: inline-block;
+    }
+    .back-button:before {
+        content: 'BACK TO INTERLINK';
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: #0b1936;
+        transition: transform 0.3s ease;
+        font-size: 18px;
+        color: #5799f7;
+        text-align: center;
+    }
+    .back-button:hover {
+        background-color: #1c275c;
+        color: #73abfa;
+        transform: translateY(-2px);
+        box-shadow: 0 6px 8px rgba(74, 131, 212, 0.2);
+    }
+    .back-button:hover:before {
+        transform: translateY(-100%);
+        color: #73abfa;
+    }
+</style>
 <center>
     <a href="https://interlinkcvhs.org/" class="back-button" target="_blank" rel="noopener noreferrer">
         interlinkcvhs.org
     </a>
-</center>
-""", unsafe_allow_html=True)
+</center>""", unsafe_allow_html=True)
 
+# Configuration for generating responses
 generation_config = {
     "temperature": 0,
     "top_p": 0.95,
@@ -82,6 +82,7 @@ generation_config = {
     "response_mime_type": "text/plain",
 }
 
+# Function to process the response
 def process_response(text):
     lines = text.split('\n')
     processed_lines = []
@@ -97,11 +98,11 @@ def process_response(text):
     text = '\n'.join(processed_lines)
     
     text = re.sub(r'\n\s*\n\s*\n', '\n\n', text)
-    
     text = re.sub(r'(\n[*-] .+?)(\n[^*\n-])', r'\1\n\2', text)
     
     return text.strip()
 
+# Initialize the chat model if it's not in session state
 SYSTEM_INSTRUCTION = """Your name is Interlink AI, an AI chatbot on Interlink.
 You are powered by the Interlink Large Language Model.
 You were created by the Interlink team.
@@ -127,10 +128,12 @@ if 'messages' not in st.session_state:
 
 st.title("💬 Interlink AI")
 
+# Displaying chat messages
 for message in st.session_state.messages:
     with st.chat_message(message["role"]):
         st.markdown(message["content"], unsafe_allow_html=True)
 
+# Handling user input
 if prompt := st.chat_input("What can I help you with?"):
     st.chat_message("user").markdown(prompt)
     st.session_state.messages.append({"role": "user", "content": prompt})
@@ -144,34 +147,21 @@ if prompt := st.chat_input("What can I help you with?"):
             
             formatted_response = process_response(response.text)
 
-            # Handling different content types (like text, DataFrame, LaTeX, etc.)
-            if "dataframe" in formatted_response:
-                # Example: Returning a DataFrame object
-                df = pd.DataFrame([['Data 1', 'Data 2'], ['Data 3', 'Data 4']], columns=['Column 1', 'Column 2'])
-                st.write(df)
-            elif "latex" in formatted_response:
-                # Example: Handling LaTeX equations
-                st.latex(r"\text{E = mc}^2")
-            elif "plot" in formatted_response:
-                # Example: Handling charting (using matplotlib, Plotly, etc.)
-                st.pyplot(plt)
-            else:
-                # For text and general formats
-                chunks = []
-                for line in formatted_response.split('\n'):
-                    chunks.extend(line.split(' '))
-                    chunks.append('\n')
+            chunks = []
+            for line in formatted_response.split('\n'):
+                chunks.extend(line.split(' '))  # Split into smaller chunks for real-time typing effect
+                chunks.append('\n')
 
-                for chunk in chunks:
-                    if chunk != '\n':
-                        full_response += chunk + ' '
-                    else:
-                        full_response += chunk
-                    time.sleep(0.05)
-                    message_placeholder.markdown(full_response + "▌", unsafe_allow_html=True)
-
-                message_placeholder.markdown(full_response, unsafe_allow_html=True)
+            # Simulate typing effect with slow display of the response
+            for chunk in chunks:
+                if chunk != '\n':
+                    full_response += chunk + ' '
+                else:
+                    full_response += chunk
+                time.sleep(0.05)
+                message_placeholder.markdown(full_response + "▌", unsafe_allow_html=True)
             
+            message_placeholder.markdown(full_response, unsafe_allow_html=True)
             st.session_state.messages.append({"role": "assistant", "content": full_response})
             
         except Exception as e:
@@ -180,3 +170,24 @@ if prompt := st.chat_input("What can I help you with?"):
                 st.warning("The API rate limit has been reached. Please wait a moment before trying again.")
             else:
                 st.warning("Please try again in a moment.")
+
+# File uploader to handle image files
+uploaded_file = st.file_uploader("Upload an image or file", type=["jpg", "png", "pdf", "txt", "csv", "xlsx"])
+
+if uploaded_file is not None:
+    # Show image
+    if uploaded_file.type in ["image/jpeg", "image/png"]:
+        image = Image.open(uploaded_file)
+        st.image(image, caption="Uploaded Image", use_column_width=True)
+    
+    # Handle text or CSV files
+    elif uploaded_file.type == "text/plain":
+        text = uploaded_file.read().decode("utf-8")
+        st.text_area("Uploaded Text", text, height=200)
+    
+    elif uploaded_file.type in ["application/vnd.ms-excel", "text/csv"]:
+        import pandas as pd
+        df = pd.read_csv(uploaded_file)
+        st.dataframe(df)  # Show data in an interactive table
+
+    # Add more file handling cases as needed
