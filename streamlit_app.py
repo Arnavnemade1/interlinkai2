@@ -11,7 +11,7 @@ if not GEMINI_API_KEY:
 genai.configure(api_key=GEMINI_API_KEY)
 
 st.set_page_config(
-    page_title="Interlink AI",
+    page_title="𝙸𝚗𝚝𝚎𝚛𝚕𝚒𝚗𝚔 𝙰𝙸",
     page_icon="./favicon.ico",
     layout="wide"
 )
