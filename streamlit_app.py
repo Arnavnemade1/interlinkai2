@@ -20,6 +20,7 @@ st.set_page_config(
     layout="wide"
 )
 
+# Custom styles
 st.markdown("""
 <style>
     .upload-container {
@@ -30,6 +31,8 @@ st.markdown("""
         cursor: pointer;
         margin-right: 10px;
         transition: transform 0.2s;
+        width: 40px;
+        height: 40px;
     }
     .upload-icon:hover {
         transform: scale(1.2);
@@ -104,7 +107,7 @@ generation_config = {
 def process_response(text):
     lines = text.split('\n')
     processed_lines = []
-    
+
     for line in lines:
         if re.match(r'^\d+\.', line.strip()):
             processed_lines.append('\n' + line.strip())
@@ -112,9 +115,8 @@ def process_response(text):
             processed_lines.append('\n' + line.strip())
         else:
             processed_lines.append(line)
-    
+
     text = '\n'.join(processed_lines)
-    
     text = re.sub(r'\n\s*\n\s*\n', '\n\n', text)
     text = re.sub(r'(\n[*-] .+?)(\n[^*\n-])', r'\1\n\2', text)
     
@@ -208,6 +210,9 @@ def main():
     if st.session_state.uploaded_file_preview:
         with st.chat_message("assistant"):
             st.markdown(f"📎 File Uploaded: {st.session_state.uploaded_file_preview}")
+            # Display the image if it was uploaded
+            if isinstance(st.session_state.uploaded_file_content, Image.Image):
+                st.image(st.session_state.uploaded_file_content)
 
     col1, col2 = st.columns([0.9, 0.1])
 
@@ -218,6 +223,15 @@ def main():
             label_visibility="collapsed",
             key="file_uploader"
         )
+        # Add an upload icon instead of the default input text
+        st.markdown("""
+            <div class="upload-container">
+                <label for="file-uploader">
+                    <img class="upload-icon" src="https://upload.wikimedia.org/wikipedia/commons/thumb/4/46/Upload_Icon.svg/1024px-Upload_Icon.svg.png" alt="Upload Icon"/>
+                </label>
+                <input class="file-upload-input" id="file-uploader" type="file" onchange="document.getElementById('file-uploader').dispatchEvent(new Event('change'))">
+            </div>
+        """, unsafe_allow_html=True)
 
     if uploaded_file is not None:
         st.session_state.uploaded_file_content, st.session_state.uploaded_file_preview = handle_file_upload(uploaded_file)
@@ -251,7 +265,7 @@ def main():
 
                 chunks = []
                 for line in formatted_response.split('\n'):
-                    chunks.extend(line.split(' '))
+                    chunks.extend(line.split(' '))  
                     chunks.append('\n')
 
                 for chunk in chunks:
