@@ -53,15 +53,6 @@ st.markdown("""
 </a>
 """, unsafe_allow_html=True)
 
-# Wrap the button in a div to center it
-st.markdown("""
-    <div class="back-button-container">
-        <a href="https://interlinkcvhs.org/" class="back-button" target="_blank" rel="noopener noreferrer">
-            interlinkcvhs.org
-        </a>
-    </div>
-""", unsafe_allow_html=True)
-
 generation_config = {
     "temperature": 0,
     "top_p": 0.95,
