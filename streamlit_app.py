@@ -66,7 +66,6 @@ st.markdown("""
             transform: translateY(-100%);
             color: #73abfa;
         }
-
     </style>
 <center>
     <a href="https://interlinkcvhs.org/" class="back-button" target="_blank" rel="noopener noreferrer">
@@ -145,20 +144,34 @@ if prompt := st.chat_input("What can I help you with?"):
             
             formatted_response = process_response(response.text)
 
-            chunks = []
-            for line in formatted_response.split('\n'):
-                chunks.extend(line.split(' '))
-                chunks.append('\n')
+            # Handling different content types (like text, DataFrame, LaTeX, etc.)
+            if "dataframe" in formatted_response:
+                # Example: Returning a DataFrame object
+                df = pd.DataFrame([['Data 1', 'Data 2'], ['Data 3', 'Data 4']], columns=['Column 1', 'Column 2'])
+                st.write(df)
+            elif "latex" in formatted_response:
+                # Example: Handling LaTeX equations
+                st.latex(r"\text{E = mc}^2")
+            elif "plot" in formatted_response:
+                # Example: Handling charting (using matplotlib, Plotly, etc.)
+                st.pyplot(plt)
+            else:
+                # For text and general formats
+                chunks = []
+                for line in formatted_response.split('\n'):
+                    chunks.extend(line.split(' '))
+                    chunks.append('\n')
 
-            for chunk in chunks:
-                if chunk != '\n':
-                    full_response += chunk + ' '
-                else:
-                    full_response += chunk
-                time.sleep(0.05)
-                message_placeholder.markdown(full_response + "▌", unsafe_allow_html=True)
+                for chunk in chunks:
+                    if chunk != '\n':
+                        full_response += chunk + ' '
+                    else:
+                        full_response += chunk
+                    time.sleep(0.05)
+                    message_placeholder.markdown(full_response + "▌", unsafe_allow_html=True)
+
+                message_placeholder.markdown(full_response, unsafe_allow_html=True)
             
-            message_placeholder.markdown(full_response, unsafe_allow_html=True)
             st.session_state.messages.append({"role": "assistant", "content": full_response})
             
         except Exception as e:
