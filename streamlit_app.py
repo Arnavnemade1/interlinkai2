@@ -20,7 +20,6 @@ st.markdown("""
     <style>
         .back-button {
             width: 210px;
-            height: 50px;
             margin-top: 20px;
             padding: 10px 20px;
             font-size: 18px;
@@ -37,24 +36,23 @@ st.markdown("""
             position: relative;
             overflow: hidden;
             display: inline-block;
-            text-align: center;
-            line-height: 30px; /* Vertically centers text */
         }
 
         .back-button:before {
             content: 'BACK TO INTERLINK';
+            display: flex;
+            align-items: center;
+            justify-content: center;
             position: absolute;
             top: 0;
             left: 0;
             right: 0;
             bottom: 0;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            background-color: #0b1936;
+            transition: transform 0.3s ease;
             font-size: 18px;
             color: #5799f7;
             text-align: center;
-            transition: transform 0.3s ease;
         }
 
         .back-button:hover {
@@ -68,6 +66,7 @@ st.markdown("""
             transform: translateY(-100%);
             color: #73abfa;
         }
+
     </style>
     
 <a href="https://interlinkcvhs.org/" class="back-button" target="_blank" rel="noopener noreferrer">
