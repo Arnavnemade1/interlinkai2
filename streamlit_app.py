@@ -3,9 +3,6 @@ import google.generativeai as genai
 import time
 import re
 import os
-import pandas as pd
-import io
-from PyPDF2 import PdfReader
 
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
 if not GEMINI_API_KEY:
@@ -21,21 +18,6 @@ st.set_page_config(
 
 st.markdown("""
 <style>
-    .upload-container {
-        display: flex;
-        align-items: center;
-    }
-    .upload-icon {
-        cursor: pointer;
-        margin-right: 10px;
-        transition: transform 0.2s;
-    }
-    .upload-icon:hover {
-        transform: scale(1.2);
-    }
-    .file-upload-input {
-        display: none;
-    }
     .stChatInputContainer {
         display: flex;
         align-items: center;
@@ -119,49 +101,6 @@ def process_response(text):
     
     return text.strip()
 
-def handle_file_upload(uploaded_file):
-    if uploaded_file is None:
-        return None, None
-
-    file_type = uploaded_file.type
-    content = None
-    preview = None
-
-    try:
-        if file_type == "text/plain":
-            content = uploaded_file.read().decode("utf-8")
-            preview = f"Text File: First 100 characters\n{content[:100]}..."
-
-        elif file_type in ["text/csv", "application/vnd.ms-excel"]:
-            df = pd.read_csv(uploaded_file)
-            content = df
-            preview = f"CSV File: {len(df)} rows, {len(df.columns)} columns"
-
-        elif file_type in [
-            "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", 
-            "application/vnd.ms-excel"
-        ]:
-            df = pd.read_excel(uploaded_file)
-            content = df
-            preview = f"Excel File: {len(df)} rows, {len(df.columns)} columns"
-
-        elif file_type == "application/pdf":
-            reader = PdfReader(uploaded_file)
-            content = ""
-            for page in reader.pages:
-                content += page.extract_text()
-            preview = f"PDF File: First 100 characters\n{content[:100]}..."
-
-        else:
-            st.error(f"Unsupported file type: {file_type}")
-            return None, None
-
-        return content, preview
-
-    except Exception as e:
-        st.error(f"Error processing file: {str(e)}")
-        return None, None
-
 SYSTEM_INSTRUCTION = """Your name is Interlink AI, an AI chatbot on Interlink.
 You are powered by the Interlink Large Language Model.
 You were created by the Interlink team.
@@ -186,10 +125,6 @@ def initialize_session_state():
             {"role": "assistant", "content": initial_message}
         ]
 
-    if 'uploaded_file_content' not in st.session_state:
-        st.session_state.uploaded_file_content = None
-        st.session_state.uploaded_file_preview = None
-
 def main():
     initialize_session_state()
 
@@ -199,22 +134,7 @@ def main():
         with st.chat_message(message["role"]):
             st.markdown(message["content"], unsafe_allow_html=True)
 
-    if st.session_state.uploaded_file_preview:
-        with st.chat_message("assistant"):
-            st.markdown(f"📎 File Uploaded: {st.session_state.uploaded_file_preview}")
-
-    col1, col2 = st.columns([0.9, 0.1])
-
-    with col2:
-        uploaded_file = st.file_uploader(
-            "Upload files", 
-            type=["jpg", "png", "pdf", "txt", "csv", "xlsx", "xls"],
-            label_visibility="collapsed",
-            key="file_uploader"
-        )
-
-    if uploaded_file is not None:
-        st.session_state.uploaded_file_content, st.session_state.uploaded_file_preview = handle_file_upload(uploaded_file)
+    col1 = st.columns([1])[0]
 
     with col1:
         prompt = st.chat_input("What can I help you with?")
@@ -223,12 +143,6 @@ def main():
         st.chat_message("user").markdown(prompt)
         
         full_prompt = prompt
-        if st.session_state.uploaded_file_content is not None:
-            if isinstance(st.session_state.uploaded_file_content, pd.DataFrame):
-                full_prompt += f"\n\n[Uploaded File Content: DataFrame with {len(st.session_state.uploaded_file_content)} rows and {len(st.session_state.uploaded_file_content.columns)} columns]\n"
-                full_prompt += st.session_state.uploaded_file_content.to_string()
-            else:
-                full_prompt += f"\n\n[Uploaded File Content]:\n{st.session_state.uploaded_file_content}"
         
         st.session_state.messages.append({"role": "user", "content": prompt})
         
@@ -243,7 +157,7 @@ def main():
 
                 chunks = []
                 for line in formatted_response.split('\n'):
-                    chunks.extend(line.split(' '))
+                    chunks.extend(line.split(' '))  # Split into chunks for smooth typing effect
                     chunks.append('\n')
 
                 for chunk in chunks:
@@ -251,7 +165,7 @@ def main():
                         full_response += chunk + ' '
                     else:
                         full_response += chunk
-                    time.sleep(0.05)
+                    time.sleep(0.05)  # Add a delay for the typing effect
                     message_placeholder.markdown(full_response + "▌", unsafe_allow_html=True)
                 
                 message_placeholder.markdown(full_response, unsafe_allow_html=True)
@@ -263,10 +177,6 @@ def main():
                     st.warning("The API rate limit has been reached. Please wait a moment before trying again.")
                 else:
                     st.warning("Please try again in a moment.")
-
-        # Reset file upload after processing
-        st.session_state.uploaded_file_content = None
-        st.session_state.uploaded_file_preview = None
 
 if __name__ == "__main__":
     main()
