@@ -16,76 +16,77 @@ st.set_page_config(
     layout="wide"
 )
 
-st.markdown(""" 
-<style>
-    .stChatInputContainer {
-        display: flex;
-        align-items: center;
-        position: fixed;
-        bottom: 20px;
-        left: 0;
-        width: 100%;
-        z-index: 10;
-        padding: 10px;
-        background-color: #ffffff;
-    }
-    .chat-container {
-        padding-bottom: 80px; /* Allow space for the chat input */
-    }
-    .stChatMessage {
-        margin-bottom: 10px;
-    }
-    .back-button {
-        width: 300px;
-        margin-top: 20px;
-        padding: 10px 20px;
-        font-size: 18px;
-        background-color: #0b1936;
-        color: #5799f7;
-        border: 2px solid #4a83d4;
-        border-radius: 10px;
-        cursor: pointer;
-        transition: all 0.3s ease;
-        font-family: 'Orbitron', sans-serif;
-        text-transform: uppercase;
-        letter-spacing: 2px;
-        box-shadow: 0 0 15px rgba(74, 131, 212, 0.3);
-        position: relative;
-        overflow: hidden;
-        display: inline-block;
-    }
-    .back-button:before {
-        content: 'BACK TO INTERLINK';
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        background-color: #0b1936;
-        transition: transform 0.3s ease;
-        font-size: 18px;
-        color: #5799f7;
-        text-align: center;
-    }
-    .back-button:hover {
-        background-color: #1c275c;
-        color: #73abfa;
-        transform: translateY(-2px);
-        box-shadow: 0 6px 8px rgba(74, 131, 212, 0.2);
-    }
-    .back-button:hover:before {
-        transform: translateY(-100%);
-        color: #73abfa;
-    }
-</style>
-<center>
-    <a href="https://interlinkcvhs.org/" class="back-button" target="_blank" rel="noopener noreferrer">
-        interlinkcvhs.org
-    </a>
-</center>""", unsafe_allow_html=True)
+# CSS to make the input always stay at the bottom
+st.markdown("""
+    <style>
+        .stChatInputContainer {
+            display: flex;
+            align-items: center;
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            padding: 10px;
+            background-color: #ffffff;
+            z-index: 10;
+        }
+        .chat-container {
+            padding-bottom: 80px; /* Allow space for the chat input */
+        }
+        .stChatMessage {
+            margin-bottom: 10px;
+        }
+        .back-button {
+            width: 300px;
+            margin-top: 20px;
+            padding: 10px 20px;
+            font-size: 18px;
+            background-color: #0b1936;
+            color: #5799f7;
+            border: 2px solid #4a83d4;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-family: 'Orbitron', sans-serif;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            box-shadow: 0 0 15px rgba(74, 131, 212, 0.3);
+            position: relative;
+            overflow: hidden;
+            display: inline-block;
+        }
+        .back-button:before {
+            content: 'BACK TO INTERLINK';
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #0b1936;
+            transition: transform 0.3s ease;
+            font-size: 18px;
+            color: #5799f7;
+            text-align: center;
+        }
+        .back-button:hover {
+            background-color: #1c275c;
+            color: #73abfa;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 8px rgba(74, 131, 212, 0.2);
+        }
+        .back-button:hover:before {
+            transform: translateY(-100%);
+            color: #73abfa;
+        }
+    </style>
+    <center>
+        <a href="https://interlinkcvhs.org/" class="back-button" target="_blank" rel="noopener noreferrer">
+            interlinkcvhs.org
+        </a>
+    </center>
+""", unsafe_allow_html=True)
 
 generation_config = {
     "temperature": 0,
@@ -145,16 +146,19 @@ def main():
 
     chat_container = st.container()
     
+    # This container holds the chat messages
     with chat_container:
         for message in st.session_state.messages:
             with st.chat_message(message["role"]):
                 st.markdown(message["content"], unsafe_allow_html=True)
 
+    # Create a column for the chat input
     col1 = st.columns([1])[0]
 
     with col1:
         prompt = st.chat_input("What can I help you with?")
 
+    # If the user provides an input
     if prompt:
         st.chat_message("user").markdown(prompt)
         
