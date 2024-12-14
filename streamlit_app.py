@@ -18,16 +18,19 @@ st.set_page_config(
 
 st.markdown("""
     <style>
+        /* Apply Orbitron font */
+        @import url('https://fonts.googleapis.com/css2?family=Orbitron&display=swap');
+        
         .back-button {
-            width: 210px;
+            width: 180px;  /* Make the button smaller */
             margin-top: 20px;
-            padding: 10px 20px;
-            font-size: 18px;
+            padding: 8px 15px;  /* Adjust padding for a smaller button */
+            font-size: 16px;  /* Slightly smaller font */
             background-color: #0b1936;
             color: #5799f7;
             border: 2px solid #4a83d4;
             border-radius: 10px;
-            font-family: 'Orbitron', sans-serif;
+            font-family: 'Orbitron', sans-serif;  /* Use Orbitron font */
             text-transform: uppercase;
             letter-spacing: 2px;
             box-shadow: 0 0 15px rgba(74, 131, 212, 0.3);
@@ -35,6 +38,7 @@ st.markdown("""
             cursor: pointer;
             overflow: hidden;
             transition: all 0.3s ease;
+            text-align: center;  /* Ensure the text is centered */
         }
         
         .back-button:before {
@@ -49,6 +53,10 @@ st.markdown("""
             bottom: 0;
             background-color: #0b1936;
             transition: transform 0.3s ease;
+            display: flex;  /* Ensure the text stays in the center */
+            align-items: center;
+            justify-content: center;
+            padding: 0 15px;  /* Adjust padding so the text fits nicely */
         }
         
         .back-button:hover {
@@ -66,12 +74,8 @@ st.markdown("""
             transform: translateY(0px);
             box-shadow: 0 0 15px rgba(74, 131, 212, 0.3);
         }
-        </style>
-    
-    <a href="https://interlinkcvhs.org/" class="back-button" target="_blank" rel="noopener noreferrer">
-        interlinkcvhs.org
-    </a>
-    """, unsafe_allow_html=True)
+    </style>
+""", unsafe_allow_html=True)
 
 generation_config = {
     "temperature": 0,
