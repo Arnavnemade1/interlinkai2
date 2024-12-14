@@ -18,72 +18,39 @@ st.set_page_config(
 
 st.markdown("""
     <style>
-        /* Apply Orbitron font */
-        @import url('https://fonts.googleapis.com/css2?family=Orbitron&display=swap');
-        
         .back-button {
-            width: 300px;  /* Increased width for a longer button */
-            margin-top: 20px;
-            padding: 20px 40px;  /* Increased padding for a more prominent button */
-            font-size: 22px;  /* Increased font size for better readability */
-            background-color: #0b1936;
-            color: #5799f7;
-            border: 2px solid #4a83d4;
-            border-radius: 12px;  /* Slightly more rounded corners */
-            font-family: 'Orbitron', sans-serif;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            box-shadow: 0 0 15px rgba(74, 131, 212, 0.3);
             position: relative;
-            cursor: pointer;
-            overflow: hidden;
+            display: inline-block;
+            margin-bottom: 1rem;
+            padding: 0.75rem 1.5rem;
+            background-color: #2563eb;
+            color: white !important;
+            text-decoration: none;
+            border-radius: 0.5rem;
+            font-weight: 600;
+            font-size: 0.875rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
             transition: all 0.3s ease;
-            text-align: center;
-            display: inline-block; /* Ensures the button is rendered properly */
-            text-decoration: none; /* Prevents underlines from appearing */
-            text-align: center; /* Ensures text is centered */
-            line-height: 1.5; /* Ensures text is vertically centered */
-        }
-        
-        .back-button:before {
-            content: 'BACK TO INTERLINK';
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background-color: #0b1936;
-            transition: transform 0.3s ease;
-            padding: 0 15px; /* Ensures padding for text inside */
+            border: 2px solid transparent;
         }
         
         .back-button:hover {
-            background-color: #1c275c;
-            color: #73abfa;
+            background-color: #1e40af;
             transform: translateY(-2px);
-            box-shadow: 0 6px 8px rgba(74, 131, 212, 0.2);
-        }
-        
-        .back-button:hover:before {
-            transform: translateY(-100%);
+            box-shadow: 0 6px 8px -1px rgba(0, 0, 0, 0.15);
+            color: white !important;
+            text-decoration: none;
         }
         
         .back-button:active {
             transform: translateY(0px);
-            box-shadow: 0 0 15px rgba(74, 131, 212, 0.3);
-        }
-        
-        /* Centering the button in the page */
-        .back-button-container {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;  /* Make sure the container takes full height */
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
         }
     </style>
+    
+<a href="https://interlinkcvhs.org/" class="back-button" target="_blank" rel="noopener noreferrer">
+    Back to Interlink
+</a>
 """, unsafe_allow_html=True)
 
 # Wrap the button in a div to center it
