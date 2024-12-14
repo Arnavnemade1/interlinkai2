@@ -68,10 +68,11 @@ st.markdown("""
         }
 
     </style>
-    
-<a href="https://interlinkcvhs.org/" class="back-button" target="_blank" rel="noopener noreferrer">
-    interlinkcvhs.org
-</a>
+<center>
+    <a href="https://interlinkcvhs.org/" class="back-button" target="_blank" rel="noopener noreferrer">
+        interlinkcvhs.org
+    </a>
+</center>
 """, unsafe_allow_html=True)
 
 generation_config = {
