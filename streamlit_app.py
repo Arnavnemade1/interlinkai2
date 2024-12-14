@@ -22,14 +22,14 @@ st.markdown("""
         @import url('https://fonts.googleapis.com/css2?family=Orbitron&display=swap');
         
         .back-button {
-            width: 230px;  /* Increased width for better appearance */
+            width: 300px;  /* Increased width for a longer button */
             margin-top: 20px;
-            padding: 15px 30px;  /* Increased padding for a larger button */
-            font-size: 20px;  /* Increased font size for better readability */
+            padding: 20px 40px;  /* Increased padding for a more prominent button */
+            font-size: 22px;  /* Increased font size for better readability */
             background-color: #0b1936;
             color: #5799f7;
             border: 2px solid #4a83d4;
-            border-radius: 10px;
+            border-radius: 12px;  /* Slightly more rounded corners */
             font-family: 'Orbitron', sans-serif;
             text-transform: uppercase;
             letter-spacing: 2px;
@@ -41,6 +41,8 @@ st.markdown("""
             text-align: center;
             display: inline-block; /* Ensures the button is rendered properly */
             text-decoration: none; /* Prevents underlines from appearing */
+            text-align: center; /* Ensures text is centered */
+            line-height: 1.5; /* Ensures text is vertically centered */
         }
         
         .back-button:before {
@@ -73,14 +75,24 @@ st.markdown("""
             transform: translateY(0px);
             box-shadow: 0 0 15px rgba(74, 131, 212, 0.3);
         }
+        
+        /* Centering the button in the page */
+        .back-button-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;  /* Make sure the container takes full height */
+        }
     </style>
 """, unsafe_allow_html=True)
 
-# Now include the link to the button
+# Wrap the button in a div to center it
 st.markdown("""
-    <a href="https://interlinkcvhs.org/" class="back-button" target="_blank" rel="noopener noreferrer">
-        interlinkcvhs.org
-    </a>
+    <div class="back-button-container">
+        <a href="https://interlinkcvhs.org/" class="back-button" target="_blank" rel="noopener noreferrer">
+            interlinkcvhs.org
+        </a>
+    </div>
 """, unsafe_allow_html=True)
 
 generation_config = {
