@@ -63,12 +63,11 @@ st.markdown("""
 
         .back-button:hover:before {
             transform: translateY(-100%);
-            content: 'interlinkcvhs.org';
         }
     </style>
     
 <a href="https://interlinkcvhs.org/" class="back-button" target="_blank" rel="noopener noreferrer">
-    Back to Interlink
+    interlinkcvhs.org
 </a>
 """, unsafe_allow_html=True)
 
