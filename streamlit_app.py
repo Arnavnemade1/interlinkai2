@@ -6,6 +6,7 @@ import os
 from PIL import Image
 import pandas as pd
 import io
+from PyPDF2 import PdfReader
 
 # Ensure GEMINI_API_KEY is set
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
@@ -135,7 +136,47 @@ for message in st.session_state.messages:
         st.markdown(message["content"], unsafe_allow_html=True)
 
 # Handling user input
-if prompt := st.chat_input("What can I help you with?"):
+prompt = st.chat_input("What can I help you with?")
+
+# Upload icon/button
+uploaded_file = st.file_uploader("Upload an image, text file, CSV, or Excel file", type=["jpg", "png", "pdf", "txt", "csv", "xlsx", "xls"], key="file_uploader", label_visibility="collapsed")
+
+if uploaded_file is not None:
+    # Show image
+    if uploaded_file.type in ["image/jpeg", "image/png"]:
+        image = Image.open(uploaded_file)
+        st.image(image, caption="Uploaded Image", use_column_width=True)
+        st.session_state.messages.append({"role": "assistant", "content": "I see you've uploaded an image. How can I assist you with it?"})
+
+    # Handle text files
+    elif uploaded_file.type == "text/plain":
+        text = uploaded_file.read().decode("utf-8")
+        st.text_area("Uploaded Text", text, height=200)
+        st.session_state.messages.append({"role": "assistant", "content": "I see you've uploaded a text file. How can I assist you with it?"})
+
+    # Handle CSV files
+    elif uploaded_file.type in ["text/csv", "application/vnd.ms-excel"]:
+        df = pd.read_csv(uploaded_file)
+        st.dataframe(df)  # Show CSV data in an interactive table
+        st.session_state.messages.append({"role": "assistant", "content": "I see you've uploaded a CSV file. How can I assist you with it?"})
+
+    # Handle Excel files (.xlsx, .xls)
+    elif uploaded_file.type in ["application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "application/vnd.ms-excel"]:
+        df = pd.read_excel(uploaded_file)
+        st.dataframe(df)  # Show Excel data in an interactive table
+        st.session_state.messages.append({"role": "assistant", "content": "I see you've uploaded an Excel file. How can I assist you with it?"})
+
+    # Handle PDF files (show text content from PDF)
+    elif uploaded_file.type == "application/pdf":
+        reader = PdfReader(uploaded_file)
+        text = ""
+        for page in reader.pages:
+            text += page.extract_text()
+        st.text_area("PDF Content", text, height=200)
+        st.session_state.messages.append({"role": "assistant", "content": "I see you've uploaded a PDF file. How can I assist you with it?"})
+
+# If a prompt is entered
+if prompt:
     st.chat_message("user").markdown(prompt)
     st.session_state.messages.append({"role": "user", "content": prompt})
     
@@ -144,8 +185,8 @@ if prompt := st.chat_input("What can I help you with?"):
         full_response = ""
         
         try:
+            # Send prompt to the chatbot model
             response = st.session_state.chat_session.send_message(prompt)
-            
             formatted_response = process_response(response.text)
 
             chunks = []
@@ -171,40 +212,3 @@ if prompt := st.chat_input("What can I help you with?"):
                 st.warning("The API rate limit has been reached. Please wait a moment before trying again.")
             else:
                 st.warning("Please try again in a moment.")
-
-# File uploader to handle image files
-uploaded_file = st.file_uploader("Upload an image, text file, CSV, or Excel file", type=["jpg", "png", "pdf", "txt", "csv", "xlsx", "xls"])
-
-if uploaded_file is not None:
-    # Show image
-    if uploaded_file.type in ["image/jpeg", "image/png"]:
-        image = Image.open(uploaded_file)
-        st.image(image, caption="Uploaded Image", use_column_width=True)
-    
-    # Handle text files
-    elif uploaded_file.type == "text/plain":
-        text = uploaded_file.read().decode("utf-8")
-        st.text_area("Uploaded Text", text, height=200)
-    
-    # Handle CSV files
-    elif uploaded_file.type in ["text/csv", "application/vnd.ms-excel"]:
-        df = pd.read_csv(uploaded_file)
-        st.dataframe(df)  # Show CSV data in an interactive table
-
-    # Handle Excel files (.xlsx, .xls)
-    elif uploaded_file.type in ["application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "application/vnd.ms-excel"]:
-        df = pd.read_excel(uploaded_file)
-        st.dataframe(df)  # Show Excel data in an interactive table
-    
-    # Handle PDF files (show text content from PDF)
-    elif uploaded_file.type == "application/pdf":
-        from PyPDF2 import PdfReader
-        reader = PdfReader(uploaded_file)
-        text = ""
-        for page in reader.pages:
-            text += page.extract_text()
-        st.text_area("PDF Content", text, height=200)
-    
-    # Handle unknown file types
-    else:
-        st.error(f"Unsupported file type: {uploaded_file.type}")
