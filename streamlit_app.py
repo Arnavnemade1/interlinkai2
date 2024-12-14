@@ -16,11 +16,24 @@ st.set_page_config(
     layout="wide"
 )
 
-st.markdown("""
+st.markdown(""" 
 <style>
     .stChatInputContainer {
         display: flex;
         align-items: center;
+        position: fixed;
+        bottom: 20px;
+        left: 0;
+        width: 100%;
+        z-index: 10;
+        padding: 10px;
+        background-color: #ffffff;
+    }
+    .chat-container {
+        padding-bottom: 80px; /* Allow space for the chat input */
+    }
+    .stChatMessage {
+        margin-bottom: 10px;
     }
     .back-button {
         width: 300px;
@@ -130,9 +143,12 @@ def main():
 
     st.title("💬 Interlink AI")
 
-    for message in st.session_state.messages:
-        with st.chat_message(message["role"]):
-            st.markdown(message["content"], unsafe_allow_html=True)
+    chat_container = st.container()
+    
+    with chat_container:
+        for message in st.session_state.messages:
+            with st.chat_message(message["role"]):
+                st.markdown(message["content"], unsafe_allow_html=True)
 
     col1 = st.columns([1])[0]
 
