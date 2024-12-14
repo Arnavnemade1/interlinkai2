@@ -4,7 +4,8 @@ import time
 import re
 import os
 from PIL import Image
-import matplotlib.pyplot as plt
+import pandas as pd
+import io
 
 # Ensure GEMINI_API_KEY is set
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
@@ -172,7 +173,7 @@ if prompt := st.chat_input("What can I help you with?"):
                 st.warning("Please try again in a moment.")
 
 # File uploader to handle image files
-uploaded_file = st.file_uploader("Upload an image or file", type=["jpg", "png", "pdf", "txt", "csv", "xlsx"])
+uploaded_file = st.file_uploader("Upload an image, text file, CSV, or Excel file", type=["jpg", "png", "pdf", "txt", "csv", "xlsx", "xls"])
 
 if uploaded_file is not None:
     # Show image
@@ -180,14 +181,30 @@ if uploaded_file is not None:
         image = Image.open(uploaded_file)
         st.image(image, caption="Uploaded Image", use_column_width=True)
     
-    # Handle text or CSV files
+    # Handle text files
     elif uploaded_file.type == "text/plain":
         text = uploaded_file.read().decode("utf-8")
         st.text_area("Uploaded Text", text, height=200)
     
-    elif uploaded_file.type in ["application/vnd.ms-excel", "text/csv"]:
-        import pandas as pd
+    # Handle CSV files
+    elif uploaded_file.type in ["text/csv", "application/vnd.ms-excel"]:
         df = pd.read_csv(uploaded_file)
-        st.dataframe(df)  # Show data in an interactive table
+        st.dataframe(df)  # Show CSV data in an interactive table
 
-    # Add more file handling cases as needed
+    # Handle Excel files (.xlsx, .xls)
+    elif uploaded_file.type in ["application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "application/vnd.ms-excel"]:
+        df = pd.read_excel(uploaded_file)
+        st.dataframe(df)  # Show Excel data in an interactive table
+    
+    # Handle PDF files (show text content from PDF)
+    elif uploaded_file.type == "application/pdf":
+        from PyPDF2 import PdfReader
+        reader = PdfReader(uploaded_file)
+        text = ""
+        for page in reader.pages:
+            text += page.extract_text()
+        st.text_area("PDF Content", text, height=200)
+    
+    # Handle unknown file types
+    else:
+        st.error(f"Unsupported file type: {uploaded_file.type}")
