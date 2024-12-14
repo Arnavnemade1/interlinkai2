@@ -8,7 +8,6 @@ import pandas as pd
 import io
 from PyPDF2 import PdfReader
 
-# Ensure GEMINI_API_KEY is set
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
 if not GEMINI_API_KEY:
     raise ValueError("Missing GEMINI_API_KEY environment variable")
@@ -21,8 +20,27 @@ st.set_page_config(
     layout="wide"
 )
 
-# Custom styles for the back button
-st.markdown("""<style>
+st.markdown("""
+<style>
+    .upload-container {
+        display: flex;
+        align-items: center;
+    }
+    .upload-icon {
+        cursor: pointer;
+        margin-right: 10px;
+        transition: transform 0.2s;
+    }
+    .upload-icon:hover {
+        transform: scale(1.2);
+    }
+    .file-upload-input {
+        display: none;
+    }
+    .stChatInputContainer {
+        display: flex;
+        align-items: center;
+    }
     .back-button {
         width: 300px;
         margin-top: 20px;
@@ -75,7 +93,6 @@ st.markdown("""<style>
     </a>
 </center>""", unsafe_allow_html=True)
 
-# Configuration for generating responses
 generation_config = {
     "temperature": 0,
     "top_p": 0.95,
@@ -84,7 +101,6 @@ generation_config = {
     "response_mime_type": "text/plain",
 }
 
-# Function to process the response
 def process_response(text):
     lines = text.split('\n')
     processed_lines = []
@@ -104,7 +120,54 @@ def process_response(text):
     
     return text.strip()
 
-# Initialize the chat model if it's not in session state
+def handle_file_upload(uploaded_file):
+    if uploaded_file is None:
+        return None, None
+
+    file_type = uploaded_file.type
+    content = None
+    preview = None
+
+    try:
+        if file_type in ["image/jpeg", "image/png"]:
+            image = Image.open(uploaded_file)
+            preview = f"Uploaded Image (Type: {file_type})"
+            content = image
+
+        elif file_type == "text/plain":
+            content = uploaded_file.read().decode("utf-8")
+            preview = f"Text File: First 100 characters\n{content[:100]}..."
+
+        elif file_type in ["text/csv", "application/vnd.ms-excel"]:
+            df = pd.read_csv(uploaded_file)
+            content = df
+            preview = f"CSV File: {len(df)} rows, {len(df.columns)} columns"
+
+        elif file_type in [
+            "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", 
+            "application/vnd.ms-excel"
+        ]:
+            df = pd.read_excel(uploaded_file)
+            content = df
+            preview = f"Excel File: {len(df)} rows, {len(df.columns)} columns"
+
+        elif file_type == "application/pdf":
+            reader = PdfReader(uploaded_file)
+            content = ""
+            for page in reader.pages:
+                content += page.extract_text()
+            preview = f"PDF File: First 100 characters\n{content[:100]}..."
+
+        else:
+            st.error(f"Unsupported file type: {file_type}")
+            return None, None
+
+        return content, preview
+
+    except Exception as e:
+        st.error(f"Error processing file: {str(e)}")
+        return None, None
+
 SYSTEM_INSTRUCTION = """Your name is Interlink AI, an AI chatbot on Interlink.
 You are powered by the Interlink Large Language Model.
 You were created by the Interlink team.
@@ -128,56 +191,50 @@ if 'messages' not in st.session_state:
         {"role": "assistant", "content": initial_message}
     ]
 
+if 'uploaded_file_content' not in st.session_state:
+    st.session_state.uploaded_file_content = None
+    st.session_state.uploaded_file_preview = None
+
 st.title("💬 Interlink AI")
 
-# Displaying chat messages
 for message in st.session_state.messages:
     with st.chat_message(message["role"]):
         st.markdown(message["content"], unsafe_allow_html=True)
 
-# Handling user input
-prompt = st.chat_input("What can I help you with?")
+if st.session_state.uploaded_file_preview:
+    with st.chat_message("assistant"):
+        st.markdown(f"📎 File Uploaded: {st.session_state.uploaded_file_preview}")
 
-# Upload icon/button
-uploaded_file = st.file_uploader("Upload an image, text file, CSV, or Excel file", type=["jpg", "png", "pdf", "txt", "csv", "xlsx", "xls"], key="file_uploader", label_visibility="collapsed")
+col1, col2 = st.columns([0.9, 0.1])
+
+with col2:
+    uploaded_file = st.file_uploader(
+        "Upload files", 
+        type=["jpg", "png", "pdf", "txt", "csv", "xlsx", "xls"],
+        label_visibility="collapsed",
+        key="file_uploader"
+    )
 
 if uploaded_file is not None:
-    # Show image
-    if uploaded_file.type in ["image/jpeg", "image/png"]:
-        image = Image.open(uploaded_file)
-        st.image(image, caption="Uploaded Image", use_column_width=True)
-        st.session_state.messages.append({"role": "assistant", "content": "I see you've uploaded an image. How can I assist you with it?"})
+    st.session_state.uploaded_file_content, st.session_state.uploaded_file_preview = handle_file_upload(uploaded_file)
+    st.experimental_rerun()
 
-    # Handle text files
-    elif uploaded_file.type == "text/plain":
-        text = uploaded_file.read().decode("utf-8")
-        st.text_area("Uploaded Text", text, height=200)
-        st.session_state.messages.append({"role": "assistant", "content": "I see you've uploaded a text file. How can I assist you with it?"})
+with col1:
+    prompt = st.chat_input("What can I help you with?")
 
-    # Handle CSV files
-    elif uploaded_file.type in ["text/csv", "application/vnd.ms-excel"]:
-        df = pd.read_csv(uploaded_file)
-        st.dataframe(df)  # Show CSV data in an interactive table
-        st.session_state.messages.append({"role": "assistant", "content": "I see you've uploaded a CSV file. How can I assist you with it?"})
-
-    # Handle Excel files (.xlsx, .xls)
-    elif uploaded_file.type in ["application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", "application/vnd.ms-excel"]:
-        df = pd.read_excel(uploaded_file)
-        st.dataframe(df)  # Show Excel data in an interactive table
-        st.session_state.messages.append({"role": "assistant", "content": "I see you've uploaded an Excel file. How can I assist you with it?"})
-
-    # Handle PDF files (show text content from PDF)
-    elif uploaded_file.type == "application/pdf":
-        reader = PdfReader(uploaded_file)
-        text = ""
-        for page in reader.pages:
-            text += page.extract_text()
-        st.text_area("PDF Content", text, height=200)
-        st.session_state.messages.append({"role": "assistant", "content": "I see you've uploaded a PDF file. How can I assist you with it?"})
-
-# If a prompt is entered
 if prompt:
     st.chat_message("user").markdown(prompt)
+    
+    full_prompt = prompt
+    if st.session_state.uploaded_file_content is not None:
+        if isinstance(st.session_state.uploaded_file_content, pd.DataFrame):
+            full_prompt += f"\n\n[Uploaded File Content: DataFrame with {len(st.session_state.uploaded_file_content)} rows and {len(st.session_state.uploaded_file_content.columns)} columns]\n"
+            full_prompt += st.session_state.uploaded_file_content.to_string()
+        elif isinstance(st.session_state.uploaded_file_content, Image.Image):
+            full_prompt += "\n\n[Uploaded File: Image]"
+        else:
+            full_prompt += f"\n\n[Uploaded File Content]:\n{st.session_state.uploaded_file_content}"
+    
     st.session_state.messages.append({"role": "user", "content": prompt})
     
     with st.chat_message("assistant"):
@@ -185,16 +242,15 @@ if prompt:
         full_response = ""
         
         try:
-            # Send prompt to the chatbot model
-            response = st.session_state.chat_session.send_message(prompt)
+            response = st.session_state.chat_session.send_message(full_prompt)
+            
             formatted_response = process_response(response.text)
 
             chunks = []
             for line in formatted_response.split('\n'):
-                chunks.extend(line.split(' '))  # Split into smaller chunks for real-time typing effect
+                chunks.extend(line.split(' '))
                 chunks.append('\n')
 
-            # Simulate typing effect with slow display of the response
             for chunk in chunks:
                 if chunk != '\n':
                     full_response += chunk + ' '
@@ -212,3 +268,7 @@ if prompt:
                 st.warning("The API rate limit has been reached. Please wait a moment before trying again.")
             else:
                 st.warning("Please try again in a moment.")
+
+if st.session_state.uploaded_file_content is not None:
+    st.session_state.uploaded_file_content = None
+    st.session_state.uploaded_file_preview = None
