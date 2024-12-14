@@ -22,15 +22,15 @@ st.markdown("""
         @import url('https://fonts.googleapis.com/css2?family=Orbitron&display=swap');
         
         .back-button {
-            width: 180px;  /* Make the button smaller */
+            width: 210px;
             margin-top: 20px;
-            padding: 8px 15px;  /* Adjust padding for a smaller button */
-            font-size: 16px;  /* Slightly smaller font */
+            padding: 10px 20px;
+            font-size: 18px;
             background-color: #0b1936;
             color: #5799f7;
             border: 2px solid #4a83d4;
             border-radius: 10px;
-            font-family: 'Orbitron', sans-serif;  /* Use Orbitron font */
+            font-family: 'Orbitron', sans-serif;
             text-transform: uppercase;
             letter-spacing: 2px;
             box-shadow: 0 0 15px rgba(74, 131, 212, 0.3);
@@ -38,7 +38,9 @@ st.markdown("""
             cursor: pointer;
             overflow: hidden;
             transition: all 0.3s ease;
-            text-align: center;  /* Ensure the text is centered */
+            text-align: center;
+            display: inline-block; /* Ensures the button is rendered properly */
+            text-decoration: none; /* Prevents underlines from appearing */
         }
         
         .back-button:before {
@@ -53,10 +55,7 @@ st.markdown("""
             bottom: 0;
             background-color: #0b1936;
             transition: transform 0.3s ease;
-            display: flex;  /* Ensure the text stays in the center */
-            align-items: center;
-            justify-content: center;
-            padding: 0 15px;  /* Adjust padding so the text fits nicely */
+            padding: 0 15px; /* Ensures padding for text inside */
         }
         
         .back-button:hover {
@@ -75,6 +74,13 @@ st.markdown("""
             box-shadow: 0 0 15px rgba(74, 131, 212, 0.3);
         }
     </style>
+""", unsafe_allow_html=True)
+
+# Now include the link to the button
+st.markdown("""
+    <a href="https://interlinkcvhs.org/" class="back-button" target="_blank" rel="noopener noreferrer">
+        <!-- Link is controlled by CSS -->
+    </a>
 """, unsafe_allow_html=True)
 
 generation_config = {
