@@ -174,101 +174,107 @@ You were created by the Interlink team.
 You are on a website called Interlink that provides Carnegie Vanguard High School (CVHS) freshmen resources to stay on top of their assignments and tests using a customized scheduling tool as well as notes, educational simulations, Quizlets, the Question of the Day (QOTD) and the Question Bank (QBank) that both provide students example questions from upcoming tests or assignments, and other resources to help them do better in school.
 The link to Interlink is: https://interlinkcvhs.org/."""
 
-if 'chat_model' not in st.session_state:
-    st.session_state.chat_model = genai.GenerativeModel(
-        model_name="gemini-1.5-flash",
-        generation_config=generation_config,
-        system_instruction=SYSTEM_INSTRUCTION,
-    )
+def initialize_session_state():
+    if 'chat_model' not in st.session_state:
+        st.session_state.chat_model = genai.GenerativeModel(
+            model_name="gemini-1.5-flash",
+            generation_config=generation_config,
+            system_instruction=SYSTEM_INSTRUCTION,
+        )
 
-if 'chat_session' not in st.session_state:
-    st.session_state.chat_session = st.session_state.chat_model.start_chat(history=[])
+    if 'chat_session' not in st.session_state:
+        st.session_state.chat_session = st.session_state.chat_model.start_chat(history=[])
 
-if 'messages' not in st.session_state:
-    initial_message = """Hello! I'm Interlink AI, your personal academic assistant for Carnegie Vanguard High School. How can I assist you today?"""
-    
-    st.session_state.messages = [
-        {"role": "assistant", "content": initial_message}
-    ]
-
-if 'uploaded_file_content' not in st.session_state:
-    st.session_state.uploaded_file_content = None
-    st.session_state.uploaded_file_preview = None
-
-st.title("💬 Interlink AI")
-
-for message in st.session_state.messages:
-    with st.chat_message(message["role"]):
-        st.markdown(message["content"], unsafe_allow_html=True)
-
-if st.session_state.uploaded_file_preview:
-    with st.chat_message("assistant"):
-        st.markdown(f"📎 File Uploaded: {st.session_state.uploaded_file_preview}")
-
-col1, col2 = st.columns([0.9, 0.1])
-
-with col2:
-    uploaded_file = st.file_uploader(
-        "Upload files", 
-        type=["jpg", "png", "pdf", "txt", "csv", "xlsx", "xls"],
-        label_visibility="collapsed",
-        key="file_uploader"
-    )
-
-if uploaded_file is not None:
-    st.session_state.uploaded_file_content, st.session_state.uploaded_file_preview = handle_file_upload(uploaded_file)
-    st.experimental_rerun()
-
-with col1:
-    prompt = st.chat_input("What can I help you with?")
-
-if prompt:
-    st.chat_message("user").markdown(prompt)
-    
-    full_prompt = prompt
-    if st.session_state.uploaded_file_content is not None:
-        if isinstance(st.session_state.uploaded_file_content, pd.DataFrame):
-            full_prompt += f"\n\n[Uploaded File Content: DataFrame with {len(st.session_state.uploaded_file_content)} rows and {len(st.session_state.uploaded_file_content.columns)} columns]\n"
-            full_prompt += st.session_state.uploaded_file_content.to_string()
-        elif isinstance(st.session_state.uploaded_file_content, Image.Image):
-            full_prompt += "\n\n[Uploaded File: Image]"
-        else:
-            full_prompt += f"\n\n[Uploaded File Content]:\n{st.session_state.uploaded_file_content}"
-    
-    st.session_state.messages.append({"role": "user", "content": prompt})
-    
-    with st.chat_message("assistant"):
-        message_placeholder = st.empty()
-        full_response = ""
+    if 'messages' not in st.session_state:
+        initial_message = """Hello! I'm Interlink AI, your personal academic assistant for Carnegie Vanguard High School. How can I assist you today?"""
         
-        try:
-            response = st.session_state.chat_session.send_message(full_prompt)
-            
-            formatted_response = process_response(response.text)
+        st.session_state.messages = [
+            {"role": "assistant", "content": initial_message}
+        ]
 
-            chunks = []
-            for line in formatted_response.split('\n'):
-                chunks.extend(line.split(' '))
-                chunks.append('\n')
+    if 'uploaded_file_content' not in st.session_state:
+        st.session_state.uploaded_file_content = None
+        st.session_state.uploaded_file_preview = None
 
-            for chunk in chunks:
-                if chunk != '\n':
-                    full_response += chunk + ' '
-                else:
-                    full_response += chunk
-                time.sleep(0.05)
-                message_placeholder.markdown(full_response + "▌", unsafe_allow_html=True)
-            
-            message_placeholder.markdown(full_response, unsafe_allow_html=True)
-            st.session_state.messages.append({"role": "assistant", "content": full_response})
-            
-        except Exception as e:
-            st.error(f"An error occurred: {str(e)}")
-            if "rate_limit" in str(e).lower():
-                st.warning("The API rate limit has been reached. Please wait a moment before trying again.")
+def main():
+    initialize_session_state()
+
+    st.title("💬 Interlink AI")
+
+    for message in st.session_state.messages:
+        with st.chat_message(message["role"]):
+            st.markdown(message["content"], unsafe_allow_html=True)
+
+    if st.session_state.uploaded_file_preview:
+        with st.chat_message("assistant"):
+            st.markdown(f"📎 File Uploaded: {st.session_state.uploaded_file_preview}")
+
+    col1, col2 = st.columns([0.9, 0.1])
+
+    with col2:
+        uploaded_file = st.file_uploader(
+            "Upload files", 
+            type=["jpg", "png", "pdf", "txt", "csv", "xlsx", "xls"],
+            label_visibility="collapsed",
+            key="file_uploader"
+        )
+
+    if uploaded_file is not None:
+        st.session_state.uploaded_file_content, st.session_state.uploaded_file_preview = handle_file_upload(uploaded_file)
+
+    with col1:
+        prompt = st.chat_input("What can I help you with?")
+
+    if prompt:
+        st.chat_message("user").markdown(prompt)
+        
+        full_prompt = prompt
+        if st.session_state.uploaded_file_content is not None:
+            if isinstance(st.session_state.uploaded_file_content, pd.DataFrame):
+                full_prompt += f"\n\n[Uploaded File Content: DataFrame with {len(st.session_state.uploaded_file_content)} rows and {len(st.session_state.uploaded_file_content.columns)} columns]\n"
+                full_prompt += st.session_state.uploaded_file_content.to_string()
+            elif isinstance(st.session_state.uploaded_file_content, Image.Image):
+                full_prompt += "\n\n[Uploaded File: Image]"
             else:
-                st.warning("Please try again in a moment.")
+                full_prompt += f"\n\n[Uploaded File Content]:\n{st.session_state.uploaded_file_content}"
+        
+        st.session_state.messages.append({"role": "user", "content": prompt})
+        
+        with st.chat_message("assistant"):
+            message_placeholder = st.empty()
+            full_response = ""
+            
+            try:
+                response = st.session_state.chat_session.send_message(full_prompt)
+                
+                formatted_response = process_response(response.text)
 
-if st.session_state.uploaded_file_content is not None:
-    st.session_state.uploaded_file_content = None
-    st.session_state.uploaded_file_preview = None
+                chunks = []
+                for line in formatted_response.split('\n'):
+                    chunks.extend(line.split(' '))
+                    chunks.append('\n')
+
+                for chunk in chunks:
+                    if chunk != '\n':
+                        full_response += chunk + ' '
+                    else:
+                        full_response += chunk
+                    time.sleep(0.05)
+                    message_placeholder.markdown(full_response + "▌", unsafe_allow_html=True)
+                
+                message_placeholder.markdown(full_response, unsafe_allow_html=True)
+                st.session_state.messages.append({"role": "assistant", "content": full_response})
+                
+            except Exception as e:
+                st.error(f"An error occurred: {str(e)}")
+                if "rate_limit" in str(e).lower():
+                    st.warning("The API rate limit has been reached. Please wait a moment before trying again.")
+                else:
+                    st.warning("Please try again in a moment.")
+
+        # Reset file upload after processing
+        st.session_state.uploaded_file_content = None
+        st.session_state.uploaded_file_preview = None
+
+if __name__ == "__main__":
+    main()
