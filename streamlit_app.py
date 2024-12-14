@@ -22,10 +22,10 @@ st.markdown("""
         @import url('https://fonts.googleapis.com/css2?family=Orbitron&display=swap');
         
         .back-button {
-            width: 210px;
+            width: 230px;  /* Increased width for better appearance */
             margin-top: 20px;
-            padding: 10px 20px;
-            font-size: 18px;
+            padding: 15px 30px;  /* Increased padding for a larger button */
+            font-size: 20px;  /* Increased font size for better readability */
             background-color: #0b1936;
             color: #5799f7;
             border: 2px solid #4a83d4;
