@@ -35,8 +35,9 @@ st.markdown("""
             box-shadow: 0 0 15px rgba(74, 131, 212, 0.3);
             position: relative;
             overflow: hidden;
+            display: inline-block;
         }
-        
+
         .back-button:before {
             content: 'BACK TO INTERLINK';
             display: flex;
@@ -63,11 +64,14 @@ st.markdown("""
 
         .back-button:hover:before {
             transform: translateY(-100%);
+            content: 'interlinkcvhs.org';
+            color: #73abfa;
         }
+
     </style>
     
 <a href="https://interlinkcvhs.org/" class="back-button" target="_blank" rel="noopener noreferrer">
-    interlinkcvhs.org
+    Back to Interlink
 </a>
 """, unsafe_allow_html=True)
 
