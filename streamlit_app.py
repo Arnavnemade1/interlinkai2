@@ -19,32 +19,51 @@ st.set_page_config(
 st.markdown("""
     <style>
         .back-button {
-            position: relative;
-            display: inline-block;
-            margin-bottom: 1rem;
-            padding: 0.75rem 1.5rem;
-            background-color: #2563eb;
-            color: white !important;
-            text-decoration: none;
-            border-radius: 0.5rem;
-            font-weight: 600;
-            font-size: 0.875rem;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            width: 210px;
+            margin-top: 20px;
+            padding: 10px 20px;
+            font-size: 18px;
+            background-color: #0b1936;
+            color: #5799f7;
+            border: 2px solid #4a83d4;
+            border-radius: 10px;
+            cursor: pointer;
             transition: all 0.3s ease;
-            border: 2px solid transparent;
+            font-family: 'Orbitron', sans-serif;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            box-shadow: 0 0 15px rgba(74, 131, 212, 0.3);
+            position: relative;
+            overflow: hidden;
         }
         
+        .back-button:before {
+            content: 'BACK TO INTERLINK';
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #0b1936;
+            transition: transform 0.3s ease;
+            font-size: 18px;
+            color: #5799f7;
+            text-align: center;
+        }
+
         .back-button:hover {
-            background-color: #1e40af;
+            background-color: #1c275c;
+            color: #73abfa;
             transform: translateY(-2px);
-            box-shadow: 0 6px 8px -1px rgba(0, 0, 0, 0.15);
-            color: white !important;
-            text-decoration: none;
+            box-shadow: 0 6px 8px rgba(74, 131, 212, 0.2);
         }
-        
-        .back-button:active {
-            transform: translateY(0px);
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+
+        .back-button:hover:before {
+            transform: translateY(-100%);
+            content: 'interlinkcvhs.org';
         }
     </style>
     
