@@ -18,7 +18,7 @@ st.set_page_config(
     layout="wide"
 )
 
-# Enhanced CSS with improved visibility and effects
+# Enhanced CSS with new color scheme
 st.markdown("""
 <style>
     /* Enhanced gradient animation */
@@ -36,23 +36,48 @@ st.markdown("""
 
     /* Glow animation */
     @keyframes glow {
-        0% { box-shadow: 0 0 5px rgba(99, 102, 241, 0.5); }
-        50% { box-shadow: 0 0 20px rgba(99, 102, 241, 0.8); }
-        100% { box-shadow: 0 0 5px rgba(99, 102, 241, 0.5); }
+        0% { box-shadow: 0 0 5px rgba(147, 51, 234, 0.5); }
+        50% { box-shadow: 0 0 20px rgba(147, 51, 234, 0.8); }
+        100% { box-shadow: 0 0 5px rgba(147, 51, 234, 0.5); }
     }
 
+    /* New background with updated gradient colors */
     .stApp {
         background: linear-gradient(
             -45deg, 
-            #7c83fd,
-            #96baff,
-            #4f46e5,
-            #818cf8,
-            #6366f1,
-            #4338ca
+            #9333EA,  /* Purple */
+            #7C3AED,  /* Violet */
+            #6D28D9,  /* Dark Purple */
+            #5B21B6,  /* Deep Purple */
+            #4C1D95,  /* Rich Purple */
+            #2E1065   /* Dark Violet */
         );
         background-size: 400% 400%;
         animation: gradient 15s ease infinite;
+    }
+
+    /* Center align title container */
+    .stTitle {
+        display: flex;
+        justify-content: center;
+        width: 100%;
+        margin-bottom: 2rem;
+    }
+
+    /* Enhanced title with animation and centered */
+    h1 {
+        color: white !important;
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        font-size: 3.5rem !important;
+        font-weight: bold !important;
+        background-color: rgba(0, 0, 0, 0.2);
+        padding: 1.5rem 3rem !important;
+        border-radius: 15px;
+        display: inline-block;
+        animation: glow 3s ease-in-out infinite;
+        backdrop-filter: blur(5px);
+        text-align: center !important;
+        margin: 0 auto !important;
     }
 
     /* Enhanced chat messages with better visibility */
@@ -73,7 +98,7 @@ st.markdown("""
     }
 
     .stChatMessage.assistant {
-        background-color: rgba(240, 244, 255, 0.95) !important;
+        background-color: rgba(147, 51, 234, 0.1) !important;
     }
 
     .stChatMessage.user {
@@ -89,24 +114,9 @@ st.markdown("""
         margin: 0 !important;
     }
 
-    /* Enhanced title with animation */
-    h1 {
-        color: white !important;
-        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
-        font-size: 3rem !important;
-        font-weight: bold !important;
-        margin-bottom: 2rem !important;
-        background-color: rgba(0, 0, 0, 0.2);
-        padding: 1.5rem;
-        border-radius: 15px;
-        display: inline-block;
-        animation: glow 3s ease-in-out infinite;
-        backdrop-filter: blur(5px);
-    }
-
     /* Enhanced buttons with hover effect */
     .stButton button {
-        background: linear-gradient(135deg, #4f46e5, #6366f1) !important;
+        background: linear-gradient(135deg, #9333EA, #7C3AED) !important;
         color: white !important;
         border-radius: 12px !important;
         padding: 12px 24px !important;
@@ -119,7 +129,7 @@ st.markdown("""
     }
 
     .stButton button:hover {
-        background: linear-gradient(135deg, #4338ca, #4f46e5) !important;
+        background: linear-gradient(135deg, #7C3AED, #6D28D9) !important;
         transform: translateY(-2px);
         box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2) !important;
     }
@@ -147,7 +157,7 @@ st.markdown("""
 
     /* Enhanced chat input */
     .stChatInput input {
-        border-color: #6366f1 !important;
+        border-color: #9333EA !important;
         border-radius: 10px !important;
         padding: 12px !important;
         font-size: 1.1rem !important;
@@ -156,7 +166,7 @@ st.markdown("""
     }
 
     .stChatInput input:focus {
-        box-shadow: 0 0 0 2px #4f46e5 !important;
+        box-shadow: 0 0 0 2px #7C3AED !important;
         transform: translateY(-1px);
     }
 
@@ -171,13 +181,13 @@ st.markdown("""
     }
 
     ::-webkit-scrollbar-thumb {
-        background: rgba(99, 102, 241, 0.7);
+        background: rgba(147, 51, 234, 0.7);
         border-radius: 5px;
         transition: background 0.3s ease;
     }
 
     ::-webkit-scrollbar-thumb:hover {
-        background: rgba(99, 102, 241, 0.9);
+        background: rgba(147, 51, 234, 0.9);
     }
 
     /* Container styling */
@@ -207,6 +217,13 @@ st.markdown("""
     #MainMenu {visibility: hidden;}
     header {visibility: hidden;}
     footer {visibility: hidden;}
+
+    /* Center align the title div */
+    div.element-container:has(h1) {
+        display: flex;
+        justify-content: center;
+        width: 100%;
+    }
 </style>
 """, unsafe_allow_html=True)
 
