@@ -253,3 +253,36 @@ def main():
             try:
                 # Check if an image was uploaded
                 if uploaded_file is not None:
+                    # Use Gemini's multimodal capabilities
+                    response = st.session_state.chat_model.generate_content([prompt, image])
+                else:
+                    # Use text-only model
+                    response = st.session_state.chat_session.send_message(full_prompt)
+                
+                formatted_response = process_response(response.text)
+
+                chunks = []
+                for line in formatted_response.split('\n'):
+                    chunks.extend(line.split(' '))  # Split into chunks for smooth typing effect
+                    chunks.append('\n')
+
+                for chunk in chunks:
+                    if chunk != '\n':
+                        full_response += chunk + ' '
+                    else:
+                        full_response += chunk
+                    time.sleep(0.05)  # Add a delay for the typing effect
+                    message_placeholder.markdown(full_response + "▌", unsafe_allow_html=True)
+                
+                message_placeholder.markdown(full_response, unsafe_allow_html=True)
+                st.session_state.messages.append({"role": "assistant", "content": full_response})
+                
+            except Exception as e:
+                st.error(f"An error occurred: {str(e)}")
+                if "rate_limit" in str(e).lower():
+                    st.warning("The API rate limit has been reached. Please wait a moment before trying again.")
+                else:
+                    st.warning("Please try again in a moment.")
+
+if __name__ == "__main__":
+    main()
