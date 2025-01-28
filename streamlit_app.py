@@ -19,25 +19,13 @@ st.set_page_config(
     layout="wide"
 )
 
-# Custom CSS for styling with animated gradient background
+# Custom CSS with improved visibility
 st.markdown("""
 <style>
     @keyframes gradient {
-        0% {
-            background-position: 0% 50%;
-        }
-        50% {
-            background-position: 100% 50%;
-        }
-        100% {
-            background-position: 0% 50%;
-        }
-    }
-
-    @keyframes sparkle {
-        0% { opacity: 0; }
-        50% { opacity: 1; }
-        100% { opacity: 0; }
+        0% { background-position: 0% 50%; }
+        50% { background-position: 100% 50%; }
+        100% { background-position: 0% 50%; }
     }
 
     .stApp {
@@ -52,124 +40,125 @@ st.markdown("""
         );
         background-size: 400% 400%;
         animation: gradient 15s ease infinite;
-        position: relative;
-        overflow: hidden;
     }
 
-    /* Create sparkle effect */
-    .stApp::before {
-        content: '';
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: radial-gradient(circle at center, rgba(255,255,255,0.2) 0%, transparent 60%);
-        pointer-events: none;
-        opacity: 0;
-        animation: sparkle 3s infinite;
-    }
-
+    /* Make chat messages more visible */
     .stChatMessage {
-        background-color: rgba(255, 255, 255, 0.9) !important;
+        background-color: white !important;
         border-radius: 15px;
         padding: 15px;
         margin: 10px 0;
         box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-        backdrop-filter: blur(10px);
         border: 1px solid rgba(255, 255, 255, 0.2);
     }
 
     .stChatMessage.assistant {
-        background-color: rgba(221, 225, 255, 0.9) !important;
-        color: #000000;
+        background-color: #f0f4ff !important;
+        color: black !important;
     }
 
     .stChatMessage.user {
-        background-color: rgba(255, 255, 255, 0.9) !important;
-        color: #000000;
+        background-color: white !important;
+        color: black !important;
     }
 
-    /* Glowing effect for buttons */
+    /* Make title clearly visible */
+    h1 {
+        color: white !important;
+        text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        font-size: 2.5rem !important;
+        font-weight: bold !important;
+        margin-bottom: 2rem !important;
+        background-color: rgba(0, 0, 0, 0.2);
+        padding: 1rem;
+        border-radius: 10px;
+        display: inline-block;
+    }
+
+    /* Style buttons */
     .stButton button {
-        background: linear-gradient(45deg, #4f46e5, #6366f1);
-        color: white;
-        border-radius: 8px;
-        padding: 10px 20px;
-        font-size: 16px;
-        font-weight: 500;
-        border: none;
-        transition: all 0.3s ease;
-        box-shadow: 0 0 15px rgba(79, 70, 229, 0.3);
+        background: #4f46e5 !important;
+        color: white !important;
+        border-radius: 8px !important;
+        padding: 10px 20px !important;
+        font-size: 16px !important;
+        font-weight: 500 !important;
+        border: none !important;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1) !important;
+        transition: all 0.3s ease !important;
     }
 
     .stButton button:hover {
+        background: #4338ca !important;
         transform: translateY(-2px);
-        box-shadow: 0 0 20px rgba(79, 70, 229, 0.5);
+        box-shadow: 0 6px 8px rgba(0, 0, 0, 0.2) !important;
+    }
+
+    /* Style file uploader */
+    .stFileUploader {
+        background-color: white !important;
+        padding: 1rem !important;
+        border-radius: 10px !important;
+        margin: 1rem 0 !important;
     }
 
     .stFileUploader button {
-        background: linear-gradient(45deg, #6366f1, #818cf8);
-        color: white;
-        border-radius: 8px;
-        padding: 10px 20px;
-        font-size: 16px;
-        font-weight: 500;
-        border: none;
-        transition: all 0.3s ease;
-        box-shadow: 0 0 15px rgba(99, 102, 241, 0.3);
+        background: #6366f1 !important;
+        color: white !important;
     }
 
     .stFileUploader button:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 0 20px rgba(99, 102, 241, 0.5);
+        background: #4f46e5 !important;
     }
 
-    /* Enhance text contrast and readability */
-    .stMarkdown {
-        color: #000000 !important;
+    /* Make input area clearly visible */
+    .stChatInputContainer {
+        background-color: white !important;
+        border-radius: 10px !important;
+        padding: 1rem !important;
+        margin-top: 1rem !important;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1) !important;
     }
 
-    .stTextInput label {
-        color: #ffffff !important;
-        text-shadow: 0 0 10px rgba(0,0,0,0.2);
+    /* Style chat input */
+    .stChatInput {
+        border-color: #6366f1 !important;
     }
 
-    .stTextInput input {
-        color: #000000 !important;
-        background-color: rgba(255, 255, 255, 0.9) !important;
+    .stChatInput:focus {
+        box-shadow: 0 0 0 2px #4f46e5 !important;
     }
 
-    h1, h2, h3 {
-        color: #ffffff !important;
-        font-weight: 600 !important;
-        text-shadow: 0 0 10px rgba(0,0,0,0.2);
-    }
-
-    .stChatFloatingInputContainer {
-        background-color: rgba(255, 255, 255, 0.9) !important;
-        border-radius: 15px;
-        padding: 5px;
-        backdrop-filter: blur(10px);
-        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    /* Make upload text visible */
+    .stFileUploader label {
+        color: black !important;
+        font-weight: bold !important;
     }
 
     /* Custom scrollbar */
     ::-webkit-scrollbar {
-        width: 10px;
+        width: 8px;
     }
 
     ::-webkit-scrollbar-track {
         background: rgba(255, 255, 255, 0.1);
+        border-radius: 4px;
     }
 
     ::-webkit-scrollbar-thumb {
         background: rgba(99, 102, 241, 0.5);
-        border-radius: 5px;
+        border-radius: 4px;
     }
 
     ::-webkit-scrollbar-thumb:hover {
         background: rgba(99, 102, 241, 0.7);
+    }
+
+    /* Container styling */
+    .main {
+        padding: 1rem;
+        max-width: 1200px;
+        margin: 0 auto;
     }
 </style>
 """, unsafe_allow_html=True)
@@ -264,36 +253,3 @@ def main():
             try:
                 # Check if an image was uploaded
                 if uploaded_file is not None:
-                    # Use Gemini's multimodal capabilities
-                    response = st.session_state.chat_model.generate_content([prompt, image])
-                else:
-                    # Use text-only model
-                    response = st.session_state.chat_session.send_message(full_prompt)
-                
-                formatted_response = process_response(response.text)
-
-                chunks = []
-                for line in formatted_response.split('\n'):
-                    chunks.extend(line.split(' '))  # Split into chunks for smooth typing effect
-                    chunks.append('\n')
-
-                for chunk in chunks:
-                    if chunk != '\n':
-                        full_response += chunk + ' '
-                    else:
-                        full_response += chunk
-                    time.sleep(0.05)  # Add a delay for the typing effect
-                    message_placeholder.markdown(full_response + "▌", unsafe_allow_html=True)
-                
-                message_placeholder.markdown(full_response, unsafe_allow_html=True)
-                st.session_state.messages.append({"role": "assistant", "content": full_response})
-                
-            except Exception as e:
-                st.error(f"An error occurred: {str(e)}")
-                if "rate_limit" in str(e).lower():
-                    st.warning("The API rate limit has been reached. Please wait a moment before trying again.")
-                else:
-                    st.warning("Please try again in a moment.")
-
-if __name__ == "__main__":
-    main()
