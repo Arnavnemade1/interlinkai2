@@ -3,77 +3,73 @@ import google.generativeai as genai
 import time
 import re
 import os
+from PIL import Image
 
+# Configure Gemini API
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
 if not GEMINI_API_KEY:
     raise ValueError("Missing GEMINI_API_KEY environment variable")
 
 genai.configure(api_key=GEMINI_API_KEY)
 
+# Set page config
 st.set_page_config(
     page_title="𝙸𝚗𝚝𝚎𝚛𝚕𝚒𝚗𝚔 𝙰𝙸",
     page_icon="./favicon.ico",
     layout="wide"
 )
 
+# Custom CSS for styling
 st.markdown("""
 <style>
     .stChatInputContainer {
         display: flex;
         align-items: center;
     }
-    .back-button {
-        width: 300px;
-        margin-top: 20px;
-        padding: 10px 20px;
-        font-size: 18px;
-        background-color: #0b1936;
-        color: #5799f7;
-        border: 2px solid #4a83d4;
+    /* Updated color scheme */
+    body {
+        background-color: #f5f5f5;
+        color: #333333;
+    }
+    .stChatMessage {
+        background-color: #ffffff;
         border-radius: 10px;
-        cursor: pointer;
-        transition: all 0.3s ease;
-        font-family: 'Orbitron', sans-serif;
-        text-transform: uppercase;
-        letter-spacing: 2px;
-        box-shadow: 0 0 15px rgba(74, 131, 212, 0.3);
-        position: relative;
-        overflow: hidden;
-        display: inline-block;
+        padding: 15px;
+        margin: 10px 0;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     }
-    .back-button:before {
-        content: 'BACK TO INTERLINK';
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        background-color: #0b1936;
-        transition: transform 0.3s ease;
-        font-size: 18px;
-        color: #5799f7;
-        text-align: center;
+    .stChatMessage.assistant {
+        background-color: #e3f2fd;
     }
-    .back-button:hover {
-        background-color: #1c275c;
-        color: #73abfa;
-        transform: translateY(-2px);
-        box-shadow: 0 6px 8px rgba(74, 131, 212, 0.2);
+    .stChatMessage.user {
+        background-color: #f5f5f5;
     }
-    .back-button:hover:before {
-        transform: translateY(-100%);
-        color: #73abfa;
+    .stButton button {
+        background-color: #1e88e5;
+        color: white;
+        border-radius: 5px;
+        padding: 10px 20px;
+        font-size: 16px;
+        transition: background-color 0.3s ease;
+    }
+    .stButton button:hover {
+        background-color: #1565c0;
+    }
+    .stFileUploader button {
+        background-color: #4caf50;
+        color: white;
+        border-radius: 5px;
+        padding: 10px 20px;
+        font-size: 16px;
+        transition: background-color 0.3s ease;
+    }
+    .stFileUploader button:hover {
+        background-color: #388e3c;
     }
 </style>
-<center>
-    <a href="https://interlinkcvhs.org/" class="back-button" target="_blank" rel="noopener noreferrer">
-        interlinkcvhs.org
-    </a>
-</center>""", unsafe_allow_html=True)
+""", unsafe_allow_html=True)
 
+# Gemini generation config
 generation_config = {
     "temperature": 0,
     "top_p": 0.95,
@@ -82,6 +78,7 @@ generation_config = {
     "response_mime_type": "text/plain",
 }
 
+# Function to process Gemini's response
 def process_response(text):
     lines = text.split('\n')
     processed_lines = []
@@ -101,12 +98,14 @@ def process_response(text):
     
     return text.strip()
 
+# System instruction for Gemini
 SYSTEM_INSTRUCTION = """Your name is Interlink AI, an AI chatbot on Interlink.
 You are powered by the Interlink Large Language Model.
 You were created by the Interlink team.
 You are on a website called Interlink that provides Carnegie Vanguard High School (CVHS) freshmen resources to stay on top of their assignments and tests using a customized scheduling tool as well as notes, educational simulations, Quizlets, the Question of the Day (QOTD) and the Question Bank (QBank) that both provide students example questions from upcoming tests or assignments, and other resources to help them do better in school.
 The link to Interlink is: https://interlinkcvhs.org/."""
 
+# Initialize session state
 def initialize_session_state():
     if 'chat_model' not in st.session_state:
         st.session_state.chat_model = genai.GenerativeModel(
@@ -125,6 +124,7 @@ def initialize_session_state():
             {"role": "assistant", "content": initial_message}
         ]
 
+# Main function
 def main():
     initialize_session_state()
 
@@ -134,6 +134,13 @@ def main():
     for message in st.session_state.messages:
         with st.chat_message(message["role"]):
             st.markdown(message["content"], unsafe_allow_html=True)
+
+    # Image upload button
+    uploaded_file = st.file_uploader("Upload an image", type=["jpg", "jpeg", "png"])
+    if uploaded_file is not None:
+        image = Image.open(uploaded_file)
+        st.image(image, caption="Uploaded Image", use_column_width=True)
+        st.session_state.messages.append({"role": "user", "content": f"Uploaded image: {uploaded_file.name}"})
 
     # Input prompt field below the chat messages
     prompt = st.chat_input("What can I help you with?")
@@ -150,7 +157,13 @@ def main():
             full_response = ""
             
             try:
-                response = st.session_state.chat_session.send_message(full_prompt)
+                # Check if an image was uploaded
+                if uploaded_file is not None:
+                    # Use Gemini's multimodal capabilities
+                    response = st.session_state.chat_model.generate_content([prompt, image])
+                else:
+                    # Use text-only model
+                    response = st.session_state.chat_session.send_message(full_prompt)
                 
                 formatted_response = process_response(response.text)
 
