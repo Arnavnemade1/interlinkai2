@@ -19,7 +19,7 @@ st.set_page_config(
     layout="wide"
 )
 
-# Custom CSS with improved visibility and bold, black chat text
+# Custom CSS with corrected text color to black
 st.markdown("""
 <style>
     @keyframes gradient {
@@ -42,7 +42,7 @@ st.markdown("""
         animation: gradient 15s ease infinite;
     }
 
-    /* Make chat messages more visible and bold */
+    /* Make chat messages more visible and bold with black text */
     .stChatMessage {
         background-color: white !important;
         border-radius: 15px;
@@ -51,17 +51,17 @@ st.markdown("""
         box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
         border: 1px solid rgba(255, 255, 255, 0.2);
         font-weight: bold !important;
-        color: black !important;  /* Make text black */
+        color: black !important;  /* Ensure text color is black */
     }
 
     .stChatMessage.assistant {
         background-color: #f0f4ff !important;
-        color: black !important; /* Ensure the assistant's text is also black */
+        color: black !important; /* Ensure assistant's text is black */
     }
 
     .stChatMessage.user {
         background-color: white !important;
-        color: black !important; /* Ensure the user's text is black */
+        color: black !important; /* Ensure user's text is black */
     }
 
     /* Make title clearly visible */
