@@ -21,6 +21,7 @@ st.set_page_config(
 )
 
 def get_color_scheme():
+    # Default colors for light/dark mode
     colors = {
         "light": {
             "gradient": ["#9333EA", "#7C3AED", "#6D28D9", "#5B21B6", "#4C1D95", "#2E1065"],
@@ -43,12 +44,14 @@ def get_dynamic_styles():
     
     return f"""
 <style>
+    /* Enhanced gradient animation */
     @keyframes gradient {{
         0% {{ background-position: 0% 50%; }}
         50% {{ background-position: 100% 50%; }}
         100% {{ background-position: 0% 50%; }}
     }}
 
+    /* Glow animation */
     @keyframes glow {{
         0% {{ box-shadow: 0 0 5px rgba({colors["chat_bg"]}, 0.5); }}
         50% {{ box-shadow: 0 0 20px rgba({colors["chat_bg"]}, 0.8); }}
@@ -71,6 +74,7 @@ def get_dynamic_styles():
         color: {colors["text"]} !important;
     }}
 
+    /* Image drop zone styling */
     .drop-zone {{
         border: 2px dashed rgba({colors["chat_bg"]}, 0.5);
         border-radius: 15px;
@@ -86,6 +90,7 @@ def get_dynamic_styles():
         background-color: rgba({colors["background"]}, 0.2);
     }}
 
+    /* Chat history sidebar */
     .chat-history {{
         background-color: rgba({colors["background"]}, 0.95);
         padding: 15px;
@@ -105,6 +110,7 @@ def get_dynamic_styles():
         background-color: rgba({colors["chat_bg"]}, 0.1);
     }}
 
+    /* Theme toggle button */
     .theme-toggle {{
         position: fixed;
         top: 20px;
@@ -114,15 +120,20 @@ def get_dynamic_styles():
 </style>
 """
 
+# Rest of your existing CSS styles...
+[Previous CSS styles remain the same but are updated with dynamic colors]
+
 def handle_image_upload():
     uploaded_file = st.file_uploader("Drop an image here or paste from clipboard", type=["jpg", "jpeg", "png"], key="file_uploader")
     
+    # Handle clipboard paste
     st.markdown("""
     <div class="drop-zone" id="paste-zone" ondrop="handleDrop(event)" ondragover="handleDragOver(event)">
         Drag & drop an image here or paste from clipboard (Ctrl+V)
     </div>
     """, unsafe_allow_html=True)
     
+    # JavaScript for handling clipboard paste and drag & drop
     st.markdown("""
     <script>
     document.addEventListener('paste', function(e) {
@@ -132,6 +143,7 @@ def handle_image_upload():
                 const blob = items[i].getAsFile();
                 const reader = new FileReader();
                 reader.onload = function(e) {
+                    // Send the image data to Streamlit
                     window.parent.postMessage({
                         type: 'image-upload',
                         data: e.target.result
@@ -169,6 +181,8 @@ def initialize_session_state():
     if 'chat_model' not in st.session_state:
         st.session_state.chat_model = genai.GenerativeModel(
             model_name="gemini-1.5-flash",
+            generation_config=generation_config,
+            system_instruction=SYSTEM_INSTRUCTION,
         )
 
     if 'chat_session' not in st.session_state:
@@ -204,14 +218,18 @@ def load_chat(chat_id):
 
 def main():
     initialize_session_state()
+
+    # Apply dynamic styles
     st.markdown(get_dynamic_styles(), unsafe_allow_html=True)
 
+    # Theme toggle
     col1, col2 = st.columns([1, 11])
     with col1:
         if st.button("🌓" if st.session_state.dark_mode else "🌞"):
             st.session_state.dark_mode = not st.session_state.dark_mode
             st.rerun()
 
+    # Sidebar with chat history
     with st.sidebar:
         st.title("Chat History")
         if st.button("New Chat"):
@@ -225,18 +243,21 @@ def main():
 
     st.title("💬 InspireX AI")
 
+    # Display messages
     for message in st.session_state.messages:
         with st.chat_message(message["role"]):
             st.markdown(message["content"], unsafe_allow_html=True)
             if "image" in message:
                 st.image(message["image"], caption="Shared Image", use_column_width=True)
 
+    # Handle image upload
     uploaded_file = handle_image_upload()
     image = None
     if uploaded_file:
         image = Image.open(uploaded_file)
         st.image(image, caption="Uploaded Image", use_column_width=True)
 
+    # Chat input
     prompt = st.chat_input("What can I help you with?")
 
     if prompt:
@@ -250,6 +271,7 @@ def main():
         else:
             st.session_state.messages.append({"role": "user", "content": prompt})
 
+        # Save to chat history
         if st.session_state.current_chat_id is None:
             create_new_chat()
         st.session_state.chat_history[st.session_state.current_chat_id]['messages'] = st.session_state.messages
@@ -257,14 +279,18 @@ def main():
         with st.chat_message("assistant"):
             message_placeholder = st.empty()
             try:
-                response = st.session_state.chat_model.generate_content([prompt])
-                response_text = response.result.candidates[0].content.parts[0].text
+                if image:
+                    response = st.session_state.chat_model.generate_content([prompt, image])
+                else:
+                    response = st.session_state.chat_session.send_message(prompt)
                 
-                message_placeholder.markdown(response_text, unsafe_allow_html=True)
-                st.session_state.messages.append({"role": "assistant", "content": response_text})
+                formatted_response = process_response(response.text)
+                message_placeholder.markdown(formatted_response, unsafe_allow_html=True)
+                st.session_state.messages.append({"role": "assistant", "content": formatted_response})
                 st.session_state.chat_history[st.session_state.current_chat_id]['messages'] = st.session_state.messages
+            
             except Exception as e:
-                st.error(f"Error: {e}")
+                message_placeholder.markdown(f"Error: {e}")
 
 if __name__ == "__main__":
     main()
