@@ -39,7 +39,8 @@ st.markdown("""
         box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     }
     .stChatMessage.assistant {
-        background-color: #e3f2fd;
+        background-color: #e3f2fd; /* Light blue background for assistant messages */
+        color: #333333; /* Dark text for readability */
     }
     .stChatMessage.user {
         background-color: #f5f5f5;
