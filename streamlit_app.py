@@ -14,39 +14,39 @@ genai.configure(api_key=GEMINI_API_KEY)
 
 # Set page config
 st.set_page_config(
-    page_title="𝙸𝚗𝚝𝚎𝚛𝚕𝚒𝚗𝚔 𝙰𝙸",
+    page_title="𝙸𝚗𝚜𝚙𝚒𝚛𝚎𝚇 𝙰𝙸",
     page_icon="./favicon.ico",
     layout="wide"
 )
 
-# Custom CSS for styling
+# Custom CSS for styling with purple and blue theme
 st.markdown("""
 <style>
     .stChatInputContainer {
         display: flex;
         align-items: center;
     }
-    /* Updated color scheme */
+    /* Updated color scheme with purple and blue */
     body {
-        background-color: #f5f5f5;
-        color: #333333;
+        background-color: #f0f2ff;  /* Light purple-blue background */
+        color: #2a2a4a;  /* Dark purple-blue text */
     }
     .stChatMessage {
         background-color: #ffffff;
         border-radius: 10px;
         padding: 15px;
         margin: 10px 0;
-        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        box-shadow: 0 4px 6px rgba(78, 54, 226, 0.1);
     }
     .stChatMessage.assistant {
-        background-color: #e3f2fd; /* Light blue background for assistant messages */
-        color: #333333; /* Dark text for readability */
+        background-color: #eef1ff;  /* Light purple background for assistant messages */
+        color: #2a2a4a;  /* Dark purple-blue text */
     }
     .stChatMessage.user {
-        background-color: #f5f5f5;
+        background-color: #f8f9ff;  /* Slightly different shade for user messages */
     }
     .stButton button {
-        background-color: #1e88e5;
+        background-color: #6366f1;  /* Indigo button */
         color: white;
         border-radius: 5px;
         padding: 10px 20px;
@@ -54,10 +54,10 @@ st.markdown("""
         transition: background-color 0.3s ease;
     }
     .stButton button:hover {
-        background-color: #1565c0;
+        background-color: #4f46e5;  /* Darker indigo on hover */
     }
     .stFileUploader button {
-        background-color: #4caf50;
+        background-color: #818cf8;  /* Lighter indigo for file uploader */
         color: white;
         border-radius: 5px;
         padding: 10px 20px;
@@ -65,7 +65,10 @@ st.markdown("""
         transition: background-color 0.3s ease;
     }
     .stFileUploader button:hover {
-        background-color: #388e3c;
+        background-color: #6366f1;
+    }
+    .stApp {
+        background: linear-gradient(135deg, #f0f2ff 0%, #e6e9ff 100%);  /* Gradient background */
     }
 </style>
 """, unsafe_allow_html=True)
@@ -100,11 +103,11 @@ def process_response(text):
     return text.strip()
 
 # System instruction for Gemini
-SYSTEM_INSTRUCTION = """Your name is Interlink AI, an AI chatbot on Interlink.
-You are powered by the Interlink Large Language Model.
-You were created by the Interlink team.
-You are on a website called Interlink that provides Carnegie Vanguard High School (CVHS) freshmen resources to stay on top of their assignments and tests using a customized scheduling tool as well as notes, educational simulations, Quizlets, the Question of the Day (QOTD) and the Question Bank (QBank) that both provide students example questions from upcoming tests or assignments, and other resources to help them do better in school.
-The link to Interlink is: https://interlinkcvhs.org/."""
+SYSTEM_INSTRUCTION = """Your name is InspireX AI, an AI chatbot on InspireX.
+You are powered by the InspireX Large Language Model.
+You were created by the InspireX team.
+You are on a website called InspireX that provides Carnegie Vanguard High School (CVHS) freshmen resources to stay on top of their assignments and tests using a customized scheduling tool as well as notes, educational simulations, Quizlets, the Question of the Day (QOTD) and the Question Bank (QBank) that both provide students example questions from upcoming tests or assignments, and other resources to help them do better in school.
+The link to InspireX is: https://inspirexcvhs.org/."""
 
 # Initialize session state
 def initialize_session_state():
@@ -119,7 +122,7 @@ def initialize_session_state():
         st.session_state.chat_session = st.session_state.chat_model.start_chat(history=[])
 
     if 'messages' not in st.session_state:
-        initial_message = """Hello! I'm Interlink AI, your personal academic assistant for Carnegie Vanguard High School. How can I assist you today?"""
+        initial_message = """Hello! I'm InspireX AI, your personal academic assistant for Carnegie Vanguard High School. How can I assist you today?"""
         
         st.session_state.messages = [
             {"role": "assistant", "content": initial_message}
@@ -129,7 +132,7 @@ def initialize_session_state():
 def main():
     initialize_session_state()
 
-    st.title("💬 Interlink AI")
+    st.title("💬 InspireX AI")
 
     # Display messages
     for message in st.session_state.messages:
