@@ -120,8 +120,7 @@ def get_dynamic_styles():
 </style>
 """
 
-# Rest of your existing CSS styles...
-[Previous CSS styles remain the same but are updated with dynamic colors]
+# Rest of your existing CSS styles (updated with dynamic colors)
 
 def handle_image_upload():
     uploaded_file = st.file_uploader("Drop an image here or paste from clipboard", type=["jpg", "jpeg", "png"], key="file_uploader")
@@ -282,15 +281,12 @@ def main():
                 if image:
                     response = st.session_state.chat_model.generate_content([prompt, image])
                 else:
-                    response = st.session_state.chat_session.send_message(prompt)
-                
-                formatted_response = process_response(response.text)
-                message_placeholder.markdown(formatted_response, unsafe_allow_html=True)
-                st.session_state.messages.append({"role": "assistant", "content": formatted_response})
-                st.session_state.chat_history[st.session_state.current_chat_id]['messages'] = st.session_state.messages
-            
+                    response = st.session_state.chat_model.generate_content([prompt])
+                st.markdown(response)
+                st.session_state.messages.append({"role": "assistant", "content": response})
+                message_placeholder.markdown(response)
             except Exception as e:
-                message_placeholder.markdown(f"Error: {e}")
+                st.error(f"Error: {e}")
 
 if __name__ == "__main__":
     main()
