@@ -12,20 +12,33 @@ if not GEMINI_API_KEY:
 
 genai.configure(api_key=GEMINI_API_KEY)
 
-# Set page config
+# Set page config - removed icon
 st.set_page_config(
     page_title="𝙸𝚗𝚜𝚙𝚒𝚛𝚎𝚇 𝙰𝙸",
-    page_icon="./favicon.ico",
     layout="wide"
 )
 
-# Custom CSS with corrected text color to black
+# Enhanced CSS with improved visibility and effects
 st.markdown("""
 <style>
+    /* Enhanced gradient animation */
     @keyframes gradient {
         0% { background-position: 0% 50%; }
         50% { background-position: 100% 50%; }
         100% { background-position: 0% 50%; }
+    }
+
+    /* Typing animation */
+    @keyframes typing {
+        from { width: 0 }
+        to { width: 100% }
+    }
+
+    /* Glow animation */
+    @keyframes glow {
+        0% { box-shadow: 0 0 5px rgba(99, 102, 241, 0.5); }
+        50% { box-shadow: 0 0 20px rgba(99, 102, 241, 0.8); }
+        100% { box-shadow: 0 0 5px rgba(99, 102, 241, 0.5); }
     }
 
     .stApp {
@@ -42,126 +55,158 @@ st.markdown("""
         animation: gradient 15s ease infinite;
     }
 
-    /* Make chat messages more visible and bold with black text */
+    /* Enhanced chat messages with better visibility */
     .stChatMessage {
-        background-color: white !important;
+        background-color: rgba(255, 255, 255, 0.95) !important;
         border-radius: 15px;
-        padding: 15px;
-        margin: 10px 0;
-        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-        border: 1px solid rgba(255, 255, 255, 0.2);
-        font-weight: bold !important;
-        color: black !important;  /* Ensure text color is black */
+        padding: 20px;
+        margin: 15px 0;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        backdrop-filter: blur(10px);
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .stChatMessage:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.25);
     }
 
     .stChatMessage.assistant {
-        background-color: #f0f4ff !important;
-        color: black !important; /* Ensure assistant's text is black */
+        background-color: rgba(240, 244, 255, 0.95) !important;
     }
 
     .stChatMessage.user {
-        background-color: white !important;
-        color: black !important; /* Ensure user's text is black */
+        background-color: rgba(255, 255, 255, 0.95) !important;
     }
 
-    /* Make title clearly visible */
+    /* Message text styling */
+    .stChatMessage p {
+        color: #1a1a1a !important;
+        font-size: 1.1rem !important;
+        line-height: 1.6 !important;
+        font-weight: 500 !important;
+        margin: 0 !important;
+    }
+
+    /* Enhanced title with animation */
     h1 {
         color: white !important;
         text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
-        font-size: 2.5rem !important;
+        font-size: 3rem !important;
         font-weight: bold !important;
         margin-bottom: 2rem !important;
         background-color: rgba(0, 0, 0, 0.2);
-        padding: 1rem;
-        border-radius: 10px;
+        padding: 1.5rem;
+        border-radius: 15px;
         display: inline-block;
+        animation: glow 3s ease-in-out infinite;
+        backdrop-filter: blur(5px);
     }
 
-    /* Style buttons */
+    /* Enhanced buttons with hover effect */
     .stButton button {
-        background: #4f46e5 !important;
+        background: linear-gradient(135deg, #4f46e5, #6366f1) !important;
         color: white !important;
-        border-radius: 8px !important;
-        padding: 10px 20px !important;
+        border-radius: 12px !important;
+        padding: 12px 24px !important;
         font-size: 16px !important;
-        font-weight: 500 !important;
+        font-weight: 600 !important;
         border: none !important;
         box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1) !important;
         transition: all 0.3s ease !important;
+        backdrop-filter: blur(5px);
     }
 
     .stButton button:hover {
-        background: #4338ca !important;
+        background: linear-gradient(135deg, #4338ca, #4f46e5) !important;
         transform: translateY(-2px);
-        box-shadow: 0 6px 8px rgba(0, 0, 0, 0.2) !important;
+        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2) !important;
     }
 
-    /* Style file uploader */
+    /* Enhanced file uploader */
     .stFileUploader {
-        background-color: white !important;
-        padding: 1rem !important;
-        border-radius: 10px !important;
-        margin: 1rem 0 !important;
+        background-color: rgba(255, 255, 255, 0.9) !important;
+        padding: 1.5rem !important;
+        border-radius: 15px !important;
+        margin: 1.5rem 0 !important;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        backdrop-filter: blur(10px);
     }
 
-    .stFileUploader button {
-        background: #6366f1 !important;
-        color: white !important;
-    }
-
-    .stFileUploader button:hover {
-        background: #4f46e5 !important;
-    }
-
-    /* Make input area clearly visible */
+    /* Enhanced chat input container */
     .stChatInputContainer {
-        background-color: white !important;
-        border-radius: 10px !important;
-        padding: 1rem !important;
-        margin-top: 1rem !important;
-        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1) !important;
+        background-color: rgba(255, 255, 255, 0.95) !important;
+        border-radius: 15px !important;
+        padding: 1.5rem !important;
+        margin-top: 1.5rem !important;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1) !important;
+        backdrop-filter: blur(10px);
+        animation: glow 3s ease-in-out infinite;
     }
 
-    /* Style chat input */
-    .stChatInput {
+    /* Enhanced chat input */
+    .stChatInput input {
         border-color: #6366f1 !important;
+        border-radius: 10px !important;
+        padding: 12px !important;
+        font-size: 1.1rem !important;
+        background-color: rgba(255, 255, 255, 0.9) !important;
+        color: #1a1a1a !important;
     }
 
-    .stChatInput:focus {
+    .stChatInput input:focus {
         box-shadow: 0 0 0 2px #4f46e5 !important;
+        transform: translateY(-1px);
     }
 
-    /* Make upload text visible */
-    .stFileUploader label {
-        color: black !important;
-        font-weight: bold !important;
-    }
-
-    /* Custom scrollbar */
+    /* Enhanced scrollbar */
     ::-webkit-scrollbar {
-        width: 8px;
+        width: 10px;
     }
 
     ::-webkit-scrollbar-track {
-        background: rgba(255, 255, 255, 0.1);
-        border-radius: 4px;
+        background: rgba(255, 255, 255, 0.2);
+        border-radius: 5px;
     }
 
     ::-webkit-scrollbar-thumb {
-        background: rgba(99, 102, 241, 0.5);
-        border-radius: 4px;
+        background: rgba(99, 102, 241, 0.7);
+        border-radius: 5px;
+        transition: background 0.3s ease;
     }
 
     ::-webkit-scrollbar-thumb:hover {
-        background: rgba(99, 102, 241, 0.7);
+        background: rgba(99, 102, 241, 0.9);
     }
 
     /* Container styling */
     .main {
-        padding: 1rem;
+        padding: 2rem;
         max-width: 1200px;
         margin: 0 auto;
+        background-color: rgba(255, 255, 255, 0.1);
+        border-radius: 20px;
+        backdrop-filter: blur(10px);
     }
+
+    /* Code block styling */
+    pre {
+        background-color: rgba(0, 0, 0, 0.8) !important;
+        border-radius: 10px !important;
+        padding: 1rem !important;
+        margin: 1rem 0 !important;
+        color: #f8f8f2 !important;
+    }
+
+    code {
+        font-family: 'Monaco', 'Consolas', monospace !important;
+    }
+
+    /* Hide Streamlit branding */
+    #MainMenu {visibility: hidden;}
+    header {visibility: hidden;}
+    footer {visibility: hidden;}
 </style>
 """, unsafe_allow_html=True)
 
@@ -188,7 +233,6 @@ def process_response(text):
             processed_lines.append(line)
     
     text = '\n'.join(processed_lines)
-    
     text = re.sub(r'\n\s*\n\s*\n', '\n\n', text)
     text = re.sub(r'(\n[*-] .+?)(\n[^*\n-])', r'\1\n\2', text)
     
@@ -215,7 +259,6 @@ def initialize_session_state():
 
     if 'messages' not in st.session_state:
         initial_message = """Hello! I'm InspireX AI, your personal academic assistant for Carnegie Vanguard High School. How can I assist you today?"""
-        
         st.session_state.messages = [
             {"role": "assistant", "content": initial_message}
         ]
@@ -238,14 +281,12 @@ def main():
         st.image(image, caption="Uploaded Image", use_column_width=True)
         st.session_state.messages.append({"role": "user", "content": f"Uploaded image: {uploaded_file.name}"})
 
-    # Input prompt field below the chat messages
+    # Input prompt field
     prompt = st.chat_input("What can I help you with?")
 
     if prompt:
         st.chat_message("user").markdown(prompt)
-        
         full_prompt = prompt
-        
         st.session_state.messages.append({"role": "user", "content": prompt})
         
         with st.chat_message("assistant"):
@@ -253,29 +294,24 @@ def main():
             full_response = ""
             
             try:
-                # Check if an image was uploaded
                 if uploaded_file is not None:
-                    # Use Gemini's multimodal capabilities
                     response = st.session_state.chat_model.generate_content([prompt, image])
                 else:
-                    # Use text-only model
                     response = st.session_state.chat_session.send_message(full_prompt)
                 
                 formatted_response = process_response(response.text)
-
                 chunks = []
                 for line in formatted_response.split('\n'):
                     chunks.append(line.strip())
                 
                 full_response = "\n".join(chunks)
-                
                 message_placeholder.markdown(full_response, unsafe_allow_html=True)
                 st.session_state.messages.append({"role": "assistant", "content": full_response})
             
             except Exception as e:
                 message_placeholder.markdown(f"Error: {e}")
-                
-            time.sleep(1)
             
+            time.sleep(1)
+
 if __name__ == "__main__":
     main()
