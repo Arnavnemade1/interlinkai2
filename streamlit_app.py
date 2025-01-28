@@ -262,4 +262,9 @@ def main():
                 
                 message_placeholder.markdown(response_text, unsafe_allow_html=True)
                 st.session_state.messages.append({"role": "assistant", "content": response_text})
-                st.session_state.chat_history[st.session_state.current_chat_id]['messages
+                st.session_state.chat_history[st.session_state.current_chat_id]['messages'] = st.session_state.messages
+            except Exception as e:
+                st.error(f"Error: {e}")
+
+if __name__ == "__main__":
+    main()
