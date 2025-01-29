@@ -48,7 +48,7 @@ class ChatApp:
             'chat_history': [],
             'current_chat_id': None,
             'dark_mode': False,
-            'show_image_upload': False  # New state for image upload visibility
+            'show_image_upload': False
         }
         
         for key, value in defaults.items():
@@ -80,27 +80,18 @@ class ChatApp:
         
         return f"""
         <style>
-            /* Animation keyframes */
             @keyframes gradient {{
                 0% {{ background-position: 0% 50%; }}
                 50% {{ background-position: 100% 50%; }}
                 100% {{ background-position: 0% 50%; }}
             }}
 
-            @keyframes glow {{
-                0% {{ box-shadow: 0 0 5px rgba({colors["chat_bg"]}, 0.5); }}
-                50% {{ box-shadow: 0 0 20px rgba({colors["chat_bg"]}, 0.8); }}
-                100% {{ box-shadow: 0 0 5px rgba({colors["chat_bg"]}, 0.5); }}
-            }}
-
-            /* Main app styling */
             .stApp {{
                 background: linear-gradient(-45deg, {gradient_colors});
                 background-size: 400% 400%;
                 animation: gradient 15s ease infinite;
             }}
 
-            /* Chat message styling */
             .stChatMessage {{
                 background-color: rgba({colors["message_bg"]}, 0.95) !important;
                 border-radius: 15px;
@@ -112,39 +103,6 @@ class ChatApp:
                 color: {colors["text"]} !important;
             }}
 
-            /* Image upload controls */
-            .image-controls {{
-                position: fixed;
-                bottom: 80px;
-                right: 20px;
-                z-index: 1000;
-                display: flex;
-                gap: 10px;
-                background: rgba({colors["message_bg"]}, 0.95);
-                padding: 10px;
-                border-radius: 20px;
-                box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-            }}
-
-            .image-button {{
-                background-color: rgba({colors["chat_bg"]}, 0.8);
-                color: {colors["text"]};
-                border: none;
-                padding: 8px 15px;
-                border-radius: 15px;
-                cursor: pointer;
-                transition: all 0.3s ease;
-                display: flex;
-                align-items: center;
-                gap: 5px;
-            }}
-
-            .image-button:hover {{
-                background-color: rgba({colors["chat_bg"]}, 1);
-                transform: translateY(-2px);
-            }}
-
-            /* Image upload zone */
             .upload-container {{
                 position: fixed;
                 bottom: 140px;
@@ -154,12 +112,6 @@ class ChatApp:
                 padding: 20px;
                 border-radius: 15px;
                 box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-                z-index: 1000;
-                display: none;
-            }}
-
-            .upload-container.visible {{
-                display: block;
             }}
 
             .drop-zone {{
@@ -178,67 +130,61 @@ class ChatApp:
                 background-color: rgba({colors["background"]}, 0.2);
             }}
 
-            /* Theme toggle */
-            .theme-toggle {{
+            .custom-button {{
+                background-color: rgba({colors["chat_bg"]}, 0.8);
+                color: {colors["text"]};
+                border: none;
+                padding: 8px 15px;
+                border-radius: 15px;
+                cursor: pointer;
+                transition: all 0.3s ease;
+                margin: 5px;
+                font-size: 16px;
+            }}
+
+            .custom-button:hover {{
+                background-color: rgba({colors["chat_bg"]}, 1);
+                transform: translateY(-2px);
+            }}
+
+            .upload-button {{
+                position: fixed;
+                bottom: 80px;
+                right: 20px;
+            }}
+
+            .theme-button {{
                 position: fixed;
                 top: 20px;
                 right: 20px;
-                background: rgba({colors["message_bg"]}, 0.95);
-                padding: 8px 15px;
-                border-radius: 20px;
-                cursor: pointer;
-                z-index: 1000;
-                color: {colors["text"]};
+            }}
+            
+            /* Make sure sidebar text is visible */
+            .st-emotion-cache-1r4qj8v {{
+                color: {colors["text"]} !important;
             }}
         </style>
-
-        <script>
-        // Toggle image upload container
-        function toggleImageUpload() {{
-            const container = document.querySelector('.upload-container');
-            container.classList.toggle('visible');
-        }}
-
-        // Handle clipboard paste
-        document.addEventListener('paste', function(e) {{
-            const items = e.clipboardData.items;
-            for (let i = 0; i < items.length; i++) {{
-                if (items[i].type.indexOf('image') !== -1) {{
-                    const blob = items[i].getAsFile();
-                    const reader = new FileReader();
-                    reader.onload = function(e) {{
-                        window.parent.postMessage({{
-                            type: 'image-upload',
-                            data: e.target.result
-                        }}, '*');
-                    }};
-                    reader.readAsDataURL(blob);
-                }}
-            }}
-        }});
-        </script>
         """
 
     def handle_image_upload(self):
-        if not st.session_state.show_image_upload:
-            return None
-
-        # Create the image upload container
-        st.markdown("""
-        <div class="upload-container visible">
-            <div class="drop-zone" id="paste-zone">
+        uploaded_file = None
+        
+        # Only show the uploader if toggle is active
+        if st.session_state.show_image_upload:
+            uploaded_file = st.file_uploader(
+                "Choose an image",
+                type=["jpg", "jpeg", "png"],
+                label_visibility="collapsed"
+            )
+            
+            st.markdown("""
+            <div class="drop-zone">
                 📸 Drag & drop an image here or paste from clipboard (Ctrl+V)
             </div>
-        </div>
-        """, unsafe_allow_html=True)
-
-        return st.file_uploader(
-            "",
-            type=["jpg", "jpeg", "png"],
-            key="file_uploader",
-            label_visibility="collapsed"
-        )
-
+            """, unsafe_allow_html=True)
+            
+        return uploaded_file
+        
     def create_new_chat(self):
         chat_id = len(st.session_state.chat_history)
         st.session_state.chat_history.append({
@@ -259,41 +205,31 @@ class ChatApp:
         return response_text
         
     def run(self):
+        # Apply styles
         st.markdown(self.get_styles(), unsafe_allow_html=True)
         
-        # Theme toggle
-        st.markdown(f"""
-        <div class="theme-toggle" onclick="document.querySelector('button[kind=secondary]').click()">
-            {'🌓' if st.session_state.dark_mode else '🌞'}
-        </div>
-        """, unsafe_allow_html=True)
-        
-        if st.button("Toggle Theme", key="theme_toggle", visible=False):
-            st.session_state.dark_mode = not st.session_state.dark_mode
-            st.rerun()
-        
-        # Image controls
-        st.markdown("""
-        <div class="image-controls">
-            <button class="image-button" onclick="document.querySelector('button[kind=primary]').click()">
-                📸 Share Image
-            </button>
-        </div>
-        """, unsafe_allow_html=True)
-        
-        if st.button("Toggle Image Upload", key="image_toggle", visible=False):
-            st.session_state.show_image_upload = not st.session_state.show_image_upload
-            st.rerun()
+        # Custom buttons
+        col1, col2, col3 = st.columns([8, 2, 2])
+        with col2:
+            if st.button("📸 Share Image", key="image_toggle", type="primary"):
+                st.session_state.show_image_upload = not st.session_state.show_image_upload
+                st.rerun()
+        with col3:
+            if st.button("🌓 Toggle Theme" if st.session_state.dark_mode else "🌞 Toggle Theme", 
+                        key="theme_toggle", type="primary"):
+                st.session_state.dark_mode = not st.session_state.dark_mode
+                st.rerun()
         
         # Sidebar
         with st.sidebar:
             st.title("Chat History")
-            if st.button("New Chat"):
+            if st.button("New Chat", type="primary"):
                 self.create_new_chat()
                 st.rerun()
             
             for chat in reversed(st.session_state.chat_history):
-                if st.button(f"Chat {chat['id']} - {chat['timestamp']}", key=f"chat_{chat['id']}"):
+                if st.button(f"Chat {chat['id']} - {chat['timestamp']}", 
+                           key=f"chat_{chat['id']}", type="secondary"):
                     self.load_chat(chat['id'])
                     st.rerun()
         
