@@ -86,10 +86,44 @@ class ChatApp:
                 100% {{ background-position: 0% 50%; }}
             }}
 
+            @keyframes float {{
+                0% {{ transform: translateY(0px); }}
+                50% {{ transform: translateY(-10px); }}
+                100% {{ transform: translateY(0px); }}
+            }}
+
             .stApp {{
                 background: linear-gradient(-45deg, {gradient_colors});
                 background-size: 400% 400%;
                 animation: gradient 15s ease infinite;
+            }}
+
+            .header-container {{
+                text-align: center;
+                padding: 2rem 0;
+                margin-bottom: 2rem;
+            }}
+
+            .main-title {{
+                font-size: 4rem;
+                font-weight: bold;
+                background: linear-gradient(to right, {colors["gradient"][0]}, {colors["gradient"][2]}, {colors["gradient"][4]});
+                -webkit-background-clip: text;
+                background-clip: text;
+                -webkit-text-fill-color: transparent;
+                margin: 0;
+                padding: 0;
+                font-family: 'Helvetica Neue', sans-serif;
+                letter-spacing: 2px;
+                text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+            }}
+
+            .title-emoji {{
+                font-size: 3.5rem;
+                margin-right: 0.5rem;
+                vertical-align: middle;
+                display: inline-block;
+                animation: float 3s ease-in-out infinite;
             }}
 
             .stChatMessage {{
@@ -104,14 +138,10 @@ class ChatApp:
             }}
 
             .upload-container {{
-                position: fixed;
-                bottom: 140px;
-                right: 20px;
-                width: 300px;
                 background: rgba({colors["message_bg"]}, 0.95);
                 padding: 20px;
                 border-radius: 15px;
-                box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+                margin-top: 1rem;
             }}
 
             .drop-zone {{
@@ -146,22 +176,13 @@ class ChatApp:
                 background-color: rgba({colors["chat_bg"]}, 1);
                 transform: translateY(-2px);
             }}
-
-            .upload-button {{
-                position: fixed;
-                bottom: 80px;
-                right: 20px;
-            }}
-
-            .theme-button {{
-                position: fixed;
-                top: 20px;
-                right: 20px;
-            }}
             
-            /* Make sure sidebar text is visible */
             .st-emotion-cache-1r4qj8v {{
                 color: {colors["text"]} !important;
+            }}
+
+            .chat-input {{
+                margin-top: 2rem;
             }}
         </style>
         """
@@ -169,19 +190,21 @@ class ChatApp:
     def handle_image_upload(self):
         uploaded_file = None
         
-        # Only show the uploader if toggle is active
         if st.session_state.show_image_upload:
-            uploaded_file = st.file_uploader(
-                "Choose an image",
-                type=["jpg", "jpeg", "png"],
-                label_visibility="collapsed"
-            )
-            
-            st.markdown("""
-            <div class="drop-zone">
-                📸 Drag & drop an image here or paste from clipboard (Ctrl+V)
-            </div>
-            """, unsafe_allow_html=True)
+            with st.container():
+                st.markdown('<div class="upload-container">', unsafe_allow_html=True)
+                uploaded_file = st.file_uploader(
+                    "Choose an image",
+                    type=["jpg", "jpeg", "png"],
+                    label_visibility="collapsed"
+                )
+                
+                st.markdown("""
+                <div class="drop-zone">
+                    📸 Drag & drop an image here or paste from clipboard (Ctrl+V)
+                </div>
+                """, unsafe_allow_html=True)
+                st.markdown('</div>', unsafe_allow_html=True)
             
         return uploaded_file
         
@@ -205,10 +228,9 @@ class ChatApp:
         return response_text
         
     def run(self):
-        # Apply styles
         st.markdown(self.get_styles(), unsafe_allow_html=True)
         
-        # Custom buttons
+        # Custom buttons in header
         col1, col2, col3 = st.columns([8, 2, 2])
         with col2:
             if st.button("📸 Share Image", key="image_toggle", type="primary"):
@@ -219,6 +241,16 @@ class ChatApp:
                         key="theme_toggle", type="primary"):
                 st.session_state.dark_mode = not st.session_state.dark_mode
                 st.rerun()
+        
+        # Centered header with enhanced styling
+        st.markdown("""
+            <div class="header-container">
+                <h1 class="main-title">
+                    <span class="title-emoji">💬</span>
+                    InspireX AI
+                </h1>
+            </div>
+        """, unsafe_allow_html=True)
         
         # Sidebar
         with st.sidebar:
@@ -232,8 +264,6 @@ class ChatApp:
                            key=f"chat_{chat['id']}", type="secondary"):
                     self.load_chat(chat['id'])
                     st.rerun()
-        
-        st.title("💬 InspireX AI")
         
         # Display messages
         for message in st.session_state.messages:
