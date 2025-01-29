@@ -23,16 +23,6 @@ SYSTEM_INSTRUCTION = """You are InspireX AI, a helpful and creative assistant.
 Provide clear, concise, and accurate responses while maintaining a friendly tone.
 Format responses using Markdown for better readability when appropriate."""
 
-# Logo SVG
-LOGO_SVG = """
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 100">
-  <circle cx="50" cy="50" r="40" fill="#9333EA" />
-  <path d="M50 20 Q50 30 45 40 Q40 50 40 60 Q40 70 50 75 Q60 70 60 60 Q60 50 55 40 Q50 30 50 20" fill="#FFFFFF" />
-  <rect x="45" y="75" width="10" height="5" fill="#FFFFFF" />
-  <text x="110" y="65" font-family="Arial" font-size="48" font-weight="bold" fill="#9333EA">InspireX AI</text>
-</svg>
-"""
-
 class ChatApp:
     def __init__(self):
         self.setup_page_config()
@@ -96,33 +86,10 @@ class ChatApp:
                 100% {{ background-position: 0% 50%; }}
             }}
 
-            @keyframes float {{
-                0% {{ transform: translateY(0px); }}
-                50% {{ transform: translateY(-10px); }}
-                100% {{ transform: translateY(0px); }}
-            }}
-
             .stApp {{
                 background: linear-gradient(-45deg, {gradient_colors});
                 background-size: 400% 400%;
                 animation: gradient 15s ease infinite;
-            }}
-
-            .header-container {{
-                text-align: center;
-                padding: 2rem 0;
-                margin-bottom: 2rem;
-            }}
-
-            .logo-container {{
-                width: 400px;
-                margin: 0 auto;
-                padding: 20px;
-            }}
-
-            .logo-container svg {{
-                width: 100%;
-                height: auto;
             }}
 
             .stChatMessage {{
@@ -137,10 +104,14 @@ class ChatApp:
             }}
 
             .upload-container {{
+                position: fixed;
+                bottom: 140px;
+                right: 20px;
+                width: 300px;
                 background: rgba({colors["message_bg"]}, 0.95);
                 padding: 20px;
                 border-radius: 15px;
-                margin-top: 1rem;
+                box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
             }}
 
             .drop-zone {{
@@ -175,13 +146,22 @@ class ChatApp:
                 background-color: rgba({colors["chat_bg"]}, 1);
                 transform: translateY(-2px);
             }}
-            
-            .st-emotion-cache-1r4qj8v {{
-                color: {colors["text"]} !important;
+
+            .upload-button {{
+                position: fixed;
+                bottom: 80px;
+                right: 20px;
             }}
 
-            .chat-input {{
-                margin-top: 2rem;
+            .theme-button {{
+                position: fixed;
+                top: 20px;
+                right: 20px;
+            }}
+            
+            /* Make sure sidebar text is visible */
+            .st-emotion-cache-1r4qj8v {{
+                color: {colors["text"]} !important;
             }}
         </style>
         """
@@ -189,21 +169,19 @@ class ChatApp:
     def handle_image_upload(self):
         uploaded_file = None
         
+        # Only show the uploader if toggle is active
         if st.session_state.show_image_upload:
-            with st.container():
-                st.markdown('<div class="upload-container">', unsafe_allow_html=True)
-                uploaded_file = st.file_uploader(
-                    "Choose an image",
-                    type=["jpg", "jpeg", "png"],
-                    label_visibility="collapsed"
-                )
-                
-                st.markdown("""
-                <div class="drop-zone">
-                    📸 Drag & drop an image here or paste from clipboard (Ctrl+V)
-                </div>
-                """, unsafe_allow_html=True)
-                st.markdown('</div>', unsafe_allow_html=True)
+            uploaded_file = st.file_uploader(
+                "Choose an image",
+                type=["jpg", "jpeg", "png"],
+                label_visibility="collapsed"
+            )
+            
+            st.markdown("""
+            <div class="drop-zone">
+                📸 Drag & drop an image here or paste from clipboard (Ctrl+V)
+            </div>
+            """, unsafe_allow_html=True)
             
         return uploaded_file
         
@@ -227,9 +205,10 @@ class ChatApp:
         return response_text
         
     def run(self):
+        # Apply styles
         st.markdown(self.get_styles(), unsafe_allow_html=True)
         
-        # Custom buttons in header
+        # Custom buttons
         col1, col2, col3 = st.columns([8, 2, 2])
         with col2:
             if st.button("📸 Share Image", key="image_toggle", type="primary"):
@@ -240,15 +219,6 @@ class ChatApp:
                         key="theme_toggle", type="primary"):
                 st.session_state.dark_mode = not st.session_state.dark_mode
                 st.rerun()
-        
-        # Centered header with logo
-        st.markdown(f"""
-            <div class="header-container">
-                <div class="logo-container">
-                    {LOGO_SVG}
-                </div>
-            </div>
-        """, unsafe_allow_html=True)
         
         # Sidebar
         with st.sidebar:
@@ -262,6 +232,8 @@ class ChatApp:
                            key=f"chat_{chat['id']}", type="secondary"):
                     self.load_chat(chat['id'])
                     st.rerun()
+        
+        st.title("💬 InspireX AI")
         
         # Display messages
         for message in st.session_state.messages:
