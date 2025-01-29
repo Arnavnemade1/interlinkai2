@@ -23,6 +23,16 @@ SYSTEM_INSTRUCTION = """You are InspireX AI, a helpful and creative assistant.
 Provide clear, concise, and accurate responses while maintaining a friendly tone.
 Format responses using Markdown for better readability when appropriate."""
 
+# Logo SVG
+LOGO_SVG = """
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 400 100">
+  <circle cx="50" cy="50" r="40" fill="#9333EA" />
+  <path d="M50 20 Q50 30 45 40 Q40 50 40 60 Q40 70 50 75 Q60 70 60 60 Q60 50 55 40 Q50 30 50 20" fill="#FFFFFF" />
+  <rect x="45" y="75" width="10" height="5" fill="#FFFFFF" />
+  <text x="110" y="65" font-family="Arial" font-size="48" font-weight="bold" fill="#9333EA">InspireX AI</text>
+</svg>
+"""
+
 class ChatApp:
     def __init__(self):
         self.setup_page_config()
@@ -104,26 +114,15 @@ class ChatApp:
                 margin-bottom: 2rem;
             }}
 
-            .main-title {{
-                font-size: 4rem;
-                font-weight: bold;
-                background: linear-gradient(to right, {colors["gradient"][0]}, {colors["gradient"][2]}, {colors["gradient"][4]});
-                -webkit-background-clip: text;
-                background-clip: text;
-                -webkit-text-fill-color: transparent;
-                margin: 0;
-                padding: 0;
-                font-family: 'Helvetica Neue', sans-serif;
-                letter-spacing: 2px;
-                text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+            .logo-container {{
+                width: 400px;
+                margin: 0 auto;
+                padding: 20px;
             }}
 
-            .title-emoji {{
-                font-size: 3.5rem;
-                margin-right: 0.5rem;
-                vertical-align: middle;
-                display: inline-block;
-                animation: float 3s ease-in-out infinite;
+            .logo-container svg {{
+                width: 100%;
+                height: auto;
             }}
 
             .stChatMessage {{
@@ -242,13 +241,12 @@ class ChatApp:
                 st.session_state.dark_mode = not st.session_state.dark_mode
                 st.rerun()
         
-        # Centered header with enhanced styling
-        st.markdown("""
+        # Centered header with logo
+        st.markdown(f"""
             <div class="header-container">
-                <h1 class="main-title">
-                    <span class="title-emoji">💬</span>
-                    InspireX AI
-                </h1>
+                <div class="logo-container">
+                    {LOGO_SVG}
+                </div>
             </div>
         """, unsafe_allow_html=True)
         
