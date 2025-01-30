@@ -4,6 +4,7 @@ import time
 import os
 from PIL import Image
 from io import BytesIO
+import streamlit.components.v1 as components
 
 # Configure Gemini API
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
@@ -59,16 +60,45 @@ class ChatApp:
     def get_styles(self):
         return """
         <style>
+            @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@700&display=swap');
+            
             @keyframes gradient {
                 0% { background-position: 0% 50%; }
                 50% { background-position: 100% 50%; }
                 100% { background-position: 0% 50%; }
             }
 
+            @keyframes glow {
+                0% { text-shadow: 0 0 10px #00FFFF, 0 0 20px #00FFFF, 0 0 30px #9333EA; }
+                50% { text-shadow: 0 0 20px #00FFFF, 0 0 30px #00FFFF, 0 0 40px #9333EA; }
+                100% { text-shadow: 0 0 10px #00FFFF, 0 0 20px #00FFFF, 0 0 30px #9333EA; }
+            }
+
             .stApp {
-                background: linear-gradient(-45deg, #9333EA, #7C3AED, #6D28D9, #5B21B6, #4C1D95, #2E1065);
+                background: linear-gradient(-45deg, #9333EA, #7C3AED, #6D28D9, #5B21B6, #4C1D95, #2E1065, #0891B2);
                 background-size: 400% 400%;
                 animation: gradient 15s ease infinite;
+            }
+
+            .title-container {
+                text-align: center;
+                margin: 20px 0;
+                padding: 20px;
+                background: rgba(0, 255, 255, 0.1);
+                border-radius: 15px;
+                backdrop-filter: blur(5px);
+                border: 1px solid rgba(255, 255, 255, 0.1);
+                box-shadow: 0 0 20px rgba(0, 255, 255, 0.2);
+            }
+
+            .glowing-title {
+                font-family: 'Orbitron', sans-serif;
+                font-size: 3em;
+                color: white;
+                animation: glow 2s ease-in-out infinite;
+                text-transform: uppercase;
+                letter-spacing: 3px;
+                margin: 0;
             }
 
             .stChatMessage {
@@ -77,7 +107,7 @@ class ChatApp:
                 margin: 10px 0;
                 padding: 15px;
                 border: 1px solid rgba(255, 255, 255, 0.1);
-                color: white !important;
+                box-shadow: 0 0 10px rgba(0, 255, 255, 0.1);
             }
 
             .stChatMessage p, .stChatMessage span {
@@ -88,6 +118,7 @@ class ChatApp:
             section[data-testid="stSidebar"] {
                 background-color: rgba(32, 33, 35, 0.9);
                 border-right: 1px solid rgba(255, 255, 255, 0.1);
+                box-shadow: 5px 0 15px rgba(0, 255, 255, 0.1);
             }
 
             .chat-history-item {
@@ -104,10 +135,11 @@ class ChatApp:
             .chat-history-item:hover {
                 background-color: rgba(75, 76, 78, 0.9);
                 transform: translateX(5px);
+                box-shadow: 0 0 15px rgba(0, 255, 255, 0.2);
             }
 
             .drop-zone {
-                border: 2px dashed rgba(147, 51, 234, 0.5);
+                border: 2px dashed rgba(0, 255, 255, 0.5);
                 border-radius: 10px;
                 padding: 20px;
                 text-align: center;
@@ -118,35 +150,42 @@ class ChatApp:
             }
 
             .drop-zone:hover {
-                border-color: rgba(147, 51, 234, 0.8);
+                border-color: rgba(0, 255, 255, 0.8);
                 background-color: rgba(55, 56, 58, 0.9);
-            }
-
-            /* Header styling */
-            .chat-header {
-                margin-bottom: 24px;
-                color: white;
+                box-shadow: 0 0 15px rgba(0, 255, 255, 0.2);
             }
 
             /* Button styling */
             .stButton button {
-                background-color: rgba(147, 51, 234, 0.8) !important;
+                background-color: rgba(8, 145, 178, 0.8) !important;
                 color: white !important;
                 border: none !important;
                 border-radius: 8px !important;
-                padding: 4px 12px !important;
+                padding: 8px 16px !important;
+                font-weight: 600 !important;
+                transition: all 0.3s ease !important;
+                text-transform: uppercase !important;
+                letter-spacing: 1px !important;
             }
 
             .stButton button:hover {
-                background-color: rgba(147, 51, 234, 1) !important;
+                background-color: rgba(8, 145, 178, 1) !important;
                 transform: translateY(-2px);
+                box-shadow: 0 0 15px rgba(0, 255, 255, 0.3);
             }
 
             /* Chat input styling */
             .stTextInput input {
                 background-color: rgba(32, 33, 35, 0.9) !important;
                 color: white !important;
-                border: 1px solid rgba(255, 255, 255, 0.1) !important;
+                border: 1px solid rgba(0, 255, 255, 0.3) !important;
+                border-radius: 8px !important;
+                padding: 10px 15px !important;
+            }
+
+            .stTextInput input:focus {
+                border-color: rgba(0, 255, 255, 0.6) !important;
+                box-shadow: 0 0 15px rgba(0, 255, 255, 0.2) !important;
             }
 
             /* Markdown text color */
@@ -162,8 +201,69 @@ class ChatApp:
                 background-color: rgba(32, 33, 35, 0.9) !important;
                 border-radius: 10px;
                 padding: 10px;
+                border: 1px solid rgba(0, 255, 255, 0.3);
+            }
+
+            /* Custom scrollbar */
+            ::-webkit-scrollbar {
+                width: 8px;
+                height: 8px;
+            }
+
+            ::-webkit-scrollbar-track {
+                background: rgba(32, 33, 35, 0.9);
+            }
+
+            ::-webkit-scrollbar-thumb {
+                background: rgba(0, 255, 255, 0.5);
+                border-radius: 4px;
+            }
+
+            ::-webkit-scrollbar-thumb:hover {
+                background: rgba(0, 255, 255, 0.8);
             }
         </style>
+
+        <script>
+        // Function to handle clipboard paste
+        function setupClipboardPaste() {
+            document.addEventListener('paste', async (e) => {
+                const items = e.clipboardData.items;
+                for (let i = 0; i < items.length; i++) {
+                    if (items[i].type.indexOf('image') !== -1) {
+                        const blob = items[i].getAsFile();
+                        const reader = new FileReader();
+                        reader.onload = function(event) {
+                            const fileInput = document.querySelector('input[type="file"]');
+                            if (fileInput) {
+                                // Create a new file from the blob
+                                const file = new File([blob], "pasted-image.png", { type: "image/png" });
+                                
+                                // Create a new DataTransfer object and add the file
+                                const dataTransfer = new DataTransfer();
+                                dataTransfer.items.add(file);
+                                
+                                // Set the file input's files
+                                fileInput.files = dataTransfer.files;
+                                
+                                // Dispatch change event
+                                const event = new Event('change', { bubbles: true });
+                                fileInput.dispatchEvent(event);
+                            }
+                        };
+                        reader.readAsDataURL(blob);
+                    }
+                }
+            });
+        }
+
+        // Set up the clipboard paste handler when the document is ready
+        if (document.readyState === 'complete') {
+            setupClipboardPaste();
+        } else {
+            window.addEventListener('load', setupClipboardPaste);
+        }
+        </script>
         """
 
     def handle_image_upload(self):
@@ -180,12 +280,12 @@ class ChatApp:
                 )
             
             with col2:
-                if st.button("📋 Paste from Clipboard"):
-                    st.info("To paste an image: Click 'Browse files' and paste with Ctrl+V in the file picker dialog")
+                if st.button("📋 Paste (Ctrl+V)", type="primary"):
+                    st.info("Just press Ctrl+V anywhere on the page!")
             
             st.markdown("""
             <div class="drop-zone">
-                📸 Drag & drop an image here<br>or<br>click 'Browse files' to upload
+                📸 Drag & drop an image here<br>or<br>paste from clipboard (Ctrl+V)
             </div>
             """, unsafe_allow_html=True)
             
@@ -211,7 +311,11 @@ class ChatApp:
         return response_text
 
     def display_chat_history(self):
-        st.sidebar.title("Chat History")
+        st.sidebar.markdown("""
+            <div class='title-container' style='text-align: center; margin-bottom: 20px;'>
+                <h2 style='color: white; font-family: Orbitron, sans-serif;'>Chat History</h2>
+            </div>
+        """, unsafe_allow_html=True)
         
         if st.sidebar.button("+ New Chat", type="primary", key="new_chat"):
             self.create_new_chat()
@@ -232,10 +336,15 @@ class ChatApp:
     def run(self):
         st.markdown(self.get_styles(), unsafe_allow_html=True)
         
-        # Header with controls
-        col1, col2 = st.columns([10, 2])
-        with col1:
-            st.title("💬 InspireX AI")
+        # Centered title with glow effect
+        st.markdown("""
+            <div class='title-container'>
+                <h1 class='glowing-title'>💬 InspireX AI</h1>
+            </div>
+        """, unsafe_allow_html=True)
+        
+        # Image upload button
+        col1, col2, col3 = st.columns([4, 4, 4])
         with col2:
             if st.button("📸 Share Image", key="image_toggle", type="primary"):
                 st.session_state.show_image_upload = not st.session_state.show_image_upload
@@ -265,36 +374,59 @@ class ChatApp:
             self._handle_chat_input(prompt, image)
     
     def _handle_chat_input(self, prompt, image=None):
-        st.chat_message("user").markdown(prompt)
-        message = {"role": "user", "content": prompt}
+        st.chat_message("user")
+        def _handle_chat_input(self, prompt, image=None):
+    """Handle chat input from the user, including text and optional images."""
+    # Display user message
+    with st.chat_message("user"):
+        st.markdown(prompt)
         if image:
-            message["image"] = image
-        st.session_state.messages.append(message)
+            st.image(image, caption="Shared Image", use_column_width=True)
+    
+    # Store user message
+    user_message = {"role": "user", "content": prompt}
+    if image:
+        user_message["image"] = image
+    st.session_state.messages.append(user_message)
+    
+    # Initialize assistant response
+    with st.chat_message("assistant"):
+        response_placeholder = st.empty()
+        response_placeholder.markdown("Thinking...")
         
-        if st.session_state.current_chat_id is None:
-            self.create_new_chat()
-            
-        st.session_state.chat_history[st.session_state.current_chat_id]['messages'] = \
-            st.session_state.messages
-        
-        with st.chat_message("assistant"):
-            message_placeholder = st.empty()
-            try:
-                response = (st.session_state.chat_model.generate_content([prompt, image]) 
-                          if image else st.session_state.chat_session.send_message(prompt))
+        try:
+            # Generate response
+            if image:
+                # If image is present, convert it to bytes
+                img_byte_arr = BytesIO()
+                image.save(img_byte_arr, format=image.format or 'PNG')
+                img_byte_arr = img_byte_arr.getvalue()
                 
-                formatted_response = self.process_response(response.text)
-                message_placeholder.markdown(formatted_response)
-                st.session_state.messages.append({
-                    "role": "assistant",
-                    "content": formatted_response
-                })
-                st.session_state.chat_history[st.session_state.current_chat_id]['messages'] = \
-                    st.session_state.messages
-                    
-            except Exception as e:
-                message_placeholder.markdown(f"Error: {str(e)}")
-
-if __name__ == "__main__":
-    app = ChatApp()
-    app.run()
+                # Send both text and image to the model
+                response = st.session_state.chat_session.send_message(
+                    prompt,
+                    image=img_byte_arr
+                )
+            else:
+                # Send only text
+                response = st.session_state.chat_session.send_message(prompt)
+            
+            # Process and display response
+            response_text = self.process_response(response.text)
+            response_placeholder.markdown(response_text)
+            
+            # Store assistant response
+            assistant_message = {"role": "assistant", "content": response_text}
+            st.session_state.messages.append(assistant_message)
+            
+            # Update chat history
+            if st.session_state.current_chat_id is None:
+                self.create_new_chat()
+            
+            current_chat = st.session_state.chat_history[st.session_state.current_chat_id]
+            current_chat['messages'] = st.session_state.messages
+            
+        except Exception as e:
+            error_message = f"An error occurred: {str(e)}"
+            response_placeholder.markdown(f"❌ {error_message}")
+            st.error(error_message)
