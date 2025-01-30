@@ -59,74 +59,109 @@ class ChatApp:
     def get_styles(self):
         return """
         <style>
-            .stApp {
-                background-color: #ffffff;
+            @keyframes gradient {
+                0% { background-position: 0% 50%; }
+                50% { background-position: 100% 50%; }
+                100% { background-position: 0% 50%; }
             }
 
-            .main {
-                background-color: #ffffff;
+            .stApp {
+                background: linear-gradient(-45deg, #9333EA, #7C3AED, #6D28D9, #5B21B6, #4C1D95, #2E1065);
+                background-size: 400% 400%;
+                animation: gradient 15s ease infinite;
             }
 
             .stChatMessage {
-                background-color: #f8f9fa !important;
+                background-color: rgba(32, 33, 35, 0.9) !important;
                 border-radius: 15px;
                 margin: 10px 0;
                 padding: 15px;
-                border: 1px solid #e9ecef;
+                border: 1px solid rgba(255, 255, 255, 0.1);
+                color: white !important;
             }
 
-            /* Make sidebar look better */
-            .css-1d391kg {
-                background-color: #f8f9fa;
+            .stChatMessage p, .stChatMessage span {
+                color: white !important;
+            }
+
+            /* Sidebar styling */
+            section[data-testid="stSidebar"] {
+                background-color: rgba(32, 33, 35, 0.9);
+                border-right: 1px solid rgba(255, 255, 255, 0.1);
             }
 
             .chat-history-item {
                 padding: 12px 15px;
                 margin: 8px 0;
                 border-radius: 10px;
-                background-color: #ffffff;
+                background-color: rgba(55, 56, 58, 0.9);
                 cursor: pointer;
                 transition: all 0.2s ease;
-                border: 1px solid #e9ecef;
+                border: 1px solid rgba(255, 255, 255, 0.1);
+                color: white;
             }
 
             .chat-history-item:hover {
-                background-color: #f1f3f5;
+                background-color: rgba(75, 76, 78, 0.9);
                 transform: translateX(5px);
             }
 
             .drop-zone {
-                border: 2px dashed #6c757d;
+                border: 2px dashed rgba(147, 51, 234, 0.5);
                 border-radius: 10px;
                 padding: 20px;
                 text-align: center;
                 margin: 10px 0;
-                background-color: #ffffff;
+                background-color: rgba(32, 33, 35, 0.9);
                 transition: all 0.3s ease;
+                color: white;
             }
 
             .drop-zone:hover {
-                border-color: #343a40;
-                background-color: #f8f9fa;
+                border-color: rgba(147, 51, 234, 0.8);
+                background-color: rgba(55, 56, 58, 0.9);
             }
 
             /* Header styling */
             .chat-header {
-                display: flex;
-                align-items: center;
-                gap: 12px;
                 margin-bottom: 24px;
-                background-color: #ffffff;
-                padding: 15px;
-                border-radius: 10px;
-                box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+                color: white;
             }
 
             /* Button styling */
             .stButton button {
-                border-radius: 8px;
-                padding: 4px 12px;
-                border: 1px solid #e9ecef;
+                background-color: rgba(147, 51, 234, 0.8) !important;
+                color: white !important;
+                border: none !important;
+                border-radius: 8px !important;
+                padding: 4px 12px !important;
+            }
+
+            .stButton button:hover {
+                background-color: rgba(147, 51, 234, 1) !important;
+                transform: translateY(-2px);
+            }
+
+            /* Chat input styling */
+            .stTextInput input {
+                background-color: rgba(32, 33, 35, 0.9) !important;
+                color: white !important;
+                border: 1px solid rgba(255, 255, 255, 0.1) !important;
+            }
+
+            /* Markdown text color */
+            .st-emotion-cache-1v0mbdj.e115fcil1, 
+            .st-emotion-cache-1v0mbdj p,
+            .st-emotion-cache-1v0mbdj span,
+            h1, h2, h3, p {
+                color: white !important;
+            }
+
+            /* File uploader styling */
+            .stFileUploader {
+                background-color: rgba(32, 33, 35, 0.9) !important;
+                border-radius: 10px;
+                padding: 10px;
             }
         </style>
         """
@@ -198,7 +233,7 @@ class ChatApp:
         st.markdown(self.get_styles(), unsafe_allow_html=True)
         
         # Header with controls
-        col1, col2, col3 = st.columns([8, 2, 2])
+        col1, col2 = st.columns([10, 2])
         with col1:
             st.title("💬 InspireX AI")
         with col2:
