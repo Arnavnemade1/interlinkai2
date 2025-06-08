@@ -18,7 +18,7 @@ GENERATION_CONFIG = {
     "max_output_tokens": 2048,
 }
 
-SYSTEM_INSTRUCTION = """You are InspireX AI, a helpful and creative assistant meant to help people answer problems relating to public health and safety.
+SYSTEM_INSTRUCTION = """You are InspireX AI, a helpful and creative assistant meant to help people answer problems relating to public health and safety in Indiana.
 Provide clear, concise, and accurate responses while maintaining a friendly tone.
 Format responses using Markdown for better readability when appropriate."""
 
