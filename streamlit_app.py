@@ -5,14 +5,12 @@ import os
 from PIL import Image
 from io import BytesIO
 
-# Configure Gemini API
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY")
 if not GEMINI_API_KEY:
     raise ValueError("Missing GEMINI_API_KEY environment variable")
 
 genai.configure(api_key=GEMINI_API_KEY)
 
-# Configuration settings
 GENERATION_CONFIG = {
     "temperature": 0.7,
     "top_p": 0.9,
@@ -84,7 +82,6 @@ class ChatApp:
                 color: white !important;
             }
 
-            /* Sidebar styling */
             section[data-testid="stSidebar"] {
                 background-color: rgba(32, 33, 35, 0.9);
                 border-right: 1px solid rgba(255, 255, 255, 0.1);
@@ -122,13 +119,11 @@ class ChatApp:
                 background-color: rgba(55, 56, 58, 0.9);
             }
 
-            /* Header styling */
             .chat-header {
                 margin-bottom: 24px;
                 color: white;
             }
 
-            /* Button styling */
             .stButton button {
                 background-color: rgba(147, 51, 234, 0.8) !important;
                 color: white !important;
@@ -142,14 +137,12 @@ class ChatApp:
                 transform: translateY(-2px);
             }
 
-            /* Chat input styling */
             .stTextInput input {
                 background-color: rgba(32, 33, 35, 0.9) !important;
                 color: white !important;
                 border: 1px solid rgba(255, 255, 255, 0.1) !important;
             }
 
-            /* Markdown text color */
             .st-emotion-cache-1v0mbdj.e115fcil1, 
             .st-emotion-cache-1v0mbdj p,
             .st-emotion-cache-1v0mbdj span,
@@ -157,7 +150,6 @@ class ChatApp:
                 color: white !important;
             }
 
-            /* File uploader styling */
             .stFileUploader {
                 background-color: rgba(32, 33, 35, 0.9) !important;
                 border-radius: 10px;
@@ -232,7 +224,6 @@ class ChatApp:
     def run(self):
         st.markdown(self.get_styles(), unsafe_allow_html=True)
         
-        # Header with controls
         col1, col2 = st.columns([10, 2])
         with col1:
             st.title("💬 InspireX AI")
@@ -241,24 +232,20 @@ class ChatApp:
                 st.session_state.show_image_upload = not st.session_state.show_image_upload
                 st.rerun()
         
-        # Sidebar with chat history
         self.display_chat_history()
         
-        # Chat interface
         for message in st.session_state.messages:
             with st.chat_message(message["role"]):
                 st.markdown(message["content"])
                 if "image" in message:
                     st.image(message["image"], caption="Shared Image", use_column_width=True)
         
-        # Handle image upload
         uploaded_file = self.handle_image_upload()
         image = None
         if uploaded_file:
             image = Image.open(uploaded_file)
             st.image(image, caption="Uploaded Image", use_column_width=True)
         
-        # Chat input
         prompt = st.chat_input("What can I help you with?")
         
         if prompt:
